@@ -1,0 +1,21 @@
+[{
+    "step_title": "Setting Dawn Of Light server",
+    "items": [{
+        "type": "textfield",
+        "desc": "MariaDB's login. Defaults to root",
+        "subitems": [{
+            "key": "wizard_sql_username",
+            "desc": "Username",
+            "defaultValue": "root"
+        }]
+    }, {
+        "type": "password",
+        "desc": "MariaDB's password. Defaults to changepassword",
+        "subitems": [{
+            "key": "wizard_sql_password",
+            "desc": "Password",
+            "defaultValue": "changepassword"
+        }]
+    }]
+
+}]

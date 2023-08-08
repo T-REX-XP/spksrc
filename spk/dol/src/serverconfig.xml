@@ -2,7 +2,7 @@
 <root>
   <Server>
     <Port>10300</Port>
-    <IP>127.0.0.1</IP>
+    <IP>@ip_address@</IP>
     <RegionIP>0.0.0.0</RegionIP>
     <RegionPort>10400</RegionPort>
     <UdpIP>0.0.0.0</UdpIP>
@@ -21,7 +21,7 @@
     <GMActionLoggerName>gmactions</GMActionLoggerName>
     <InvalidNamesFile>./config/invalidnames.txt</InvalidNamesFile>
     <DBType>MYSQL</DBType>
-    <DBConnectionString>server=localhost;port=3306;database=dol;user id=@login@;password=@password@;treattinyasboolean=False</DBConnectionString>
+    <DBConnectionString>server=localhost;port=@port@;database=dol;user id=@login@;password=@password@;treattinyasboolean=False</DBConnectionString>
     <DBAutosave>True</DBAutosave>
     <DBAutosaveInterval>10</DBAutosaveInterval>
     <CpuUse>4</CpuUse>

@@ -1,0 +1,28 @@
+--- DOLServer/actions/ConsoleStart.cs	2021-07-05 21:12:04.169707134 +0200
++++ DOLServer/actions/ConsoleStart.fix	2022-05-23 18:02:52.114279661 +0200
+@@ -24,6 +24,7 @@
+ using DOL.GS.PacketHandler;
+ using DOLGameServerConsole;
+ using log4net;
++using System.Threading;
+ 
+ namespace DOL.DOLServer.Actions
+ {
+@@ -115,6 +116,9 @@
+ 			bool run = true;
+ 			while (run)
+ 			{
++				Thread.Sleep(10000);
++
++/*				
+ 				Console.Write("> ");
+ 				string line = Console.ReadLine();
+ 
+@@ -153,6 +157,7 @@
+ 						}
+ 						break;
+ 				}
++*/
+ 			}
+ 			if (GameServer.Instance != null)
+ 				GameServer.Instance.Stop();

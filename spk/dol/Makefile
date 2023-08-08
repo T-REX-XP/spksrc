@@ -1,10 +1,12 @@
 SPK_NAME = dol
 SPK_VERS = 1.9.7
-SPK_REV = 1
+SPK_REV = 3886
 SPK_ICON = src/dol.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
+
+SPK_DEPENDS = "MariaDB10:dotnet-runtime"
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = DOL Server is a server emulator for the game Dark Age of Camelot written by the Dawn of Light community
@@ -22,6 +24,9 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 NO_SERVICE_SHORTCUT = yes
 
+# Make sure ARCH is not defined
+override ARCH=
+
 POST_STRIP_TARGET = dol_extra_install
 
 include ../../mk/spksrc.spk.mk
@@ -30,3 +35,4 @@ include ../../mk/spksrc.spk.mk
 dol_extra_install:
 	install -m 755 -d $(STAGING_DIR)/config
 	install -m 644 src/serverconfig.xml $(STAGING_DIR)/config/
+	install -m 644 src/public-db.mysql.sql $(STAGING_DIR)/config/

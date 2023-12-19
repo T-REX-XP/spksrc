@@ -1,5 +1,5 @@
 PKG_NAME = dol
-PKG_VERS = 2.0.0.3895
+PKG_VERS = 2.2.0.3901
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Dawn-of-Light/DOLSharp/archive/refs/tags

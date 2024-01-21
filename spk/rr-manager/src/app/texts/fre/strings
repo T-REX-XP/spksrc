@@ -1,4 +1,4 @@
 [app]
-app_name = "SimpleExtJSApp"
-description = "Application ExtJS de démonstration"
+app_name = "RR Manager"
+description = "Application RR Manager"
 index_title = "Aide"

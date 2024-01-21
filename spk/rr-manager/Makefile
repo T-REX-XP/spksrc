@@ -7,9 +7,9 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = DigitalBox98
+MAINTAINER = T-REX-XP
 
-DESCRIPTION = SimpleExtJS Application demo to illustrate the usage of Syno ExtJS framework for DSM applications. This package is for experienced users.
+DESCRIPTION = RRManager Application demo to illustrate the usage of Syno ExtJS framework for DSM applications. This package is for experienced users.
 STARTABLE = no
 DISPLAY_NAME = RRManager
 

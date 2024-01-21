@@ -174,7 +174,7 @@ dsm-%: local.mk
 
 setup-synocommunity: setup
 	@sed -i -e "s|PUBLISH_URL\s*=.*|PUBLISH_URL = https://api.synocommunity.com|" \
-		-e "s|DISTRIBUTOR\s*=.*|DISTRIBUTOR = SynoCommunity|" \
-		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
-		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
+		-e "s|DISTRIBUTOR\s*=.*|DISTRIBUTOR = T-REX-XP|" \
+		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://github.com/T-REX-XP/RRManager|" \
+		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/T-REX-XP/RRManager/issues|" \
 		local.mk

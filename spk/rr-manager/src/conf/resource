@@ -19,13 +19,13 @@
       ]
     },
     "portals": [
-      {
-        "service": "rr-manager",
-        "type": "alias",
-        "name": "RRManager API Docs",
-        "alias": "rr-manager",
-        "app": "com.synocommunity.packages.rr-manager"
-      }
+      // {
+      //   "service": "rr-manager",
+      //   "type": "alias",
+      //   "name": "RRManager API Docs",
+      //   "alias": "rr-manager",
+      //   "app": "com.synocommunity.packages.rr-manager"
+      // }
     ],
     "pkg_dir_prepare": [
       {

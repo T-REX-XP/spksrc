@@ -1,17 +1,17 @@
 {
-    ".url": {
-        "com.synocommunity.packages.rr-manager": {
-            "title": "RR Manager API Docs",
-            "desc": "RR Manager API Docs",
-            "icon": "images/rr-manager-{0}.png",
-            "type": "url",
-            "protocol": "http",
-            "port": "80",
-            "url": "/rr-manager",
-            "allUsers": false,
-            "grantPrivilege": "local"
-        }
-    },
+    // ".url": {
+    //     "com.synocommunity.packages.rr-manager": {
+    //         "title": "RR Manager API Docs",
+    //         "desc": "RR Manager API Docs",
+    //         "icon": "images/rr-manager-{0}.png",
+    //         "type": "url",
+    //         "protocol": "http",
+    //         "port": "80",
+    //         "url": "/rr-manager",
+    //         "allUsers": false,
+    //         "grantPrivilege": "local"
+    //     }
+    // },
     "rr-manager.js": {
         "SYNOCOMMUNITY.RRManager.AppInstance": {
             "type": "app",

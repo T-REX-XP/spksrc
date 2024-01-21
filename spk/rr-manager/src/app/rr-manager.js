@@ -1278,6 +1278,8 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 	
     onOpen: function(a) {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
+        debugger;
+        console.log("----onOpen");
 
     }
 });

@@ -1,9 +1,9 @@
 PKG_NAME = RRManager
 PKG_VERS = 0.1
 PKG_EXT = tar.gz
-PKG_DIST_NAME =v$(PKG_VERS)
+PKG_DIST_NAME =v$(PKG_VERS).$(PKG_EXT)
 # $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/T-REX-XP/RRManager/archive/refs/tags/
+PKG_DIST_SITE = https://github.com/T-REX-XP/RRManager/archive/refs/tags
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

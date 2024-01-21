@@ -1,3 +1,0 @@
-lnk:bin/pinentry
-bin:bin/pinentry-tty
-bin:bin/pinentry-curses

@@ -1,6 +1,0 @@
-bin:bin/ncat
-rsc:bin/ndiff
-bin:bin/nmap
-bin:bin/nping
-rsc:share/ncat
-rsc:share/nmap

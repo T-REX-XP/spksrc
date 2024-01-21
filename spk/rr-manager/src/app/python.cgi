@@ -1,14 +1,31 @@
 #!/usr/bin/python
 
-import os, sys
+import os
+import json
 
-print("Content-type: text/html\n")
+print("Content-type: application/json\n")
 
-f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi','r')
-user = f.read()
+# Authenticate the user
+f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
+user = f.read().strip()  # .strip() to remove any trailing newline characters
 
-if len(user)>0:
-    print("Security : user authenticated "+user)
+response = {}
+
+if len(user) > 0:
+    response["status"] = "authenticated"
+    response["user"] = user
+
+    # Listing directories in /mnt/
+    directories = []
+    try:
+        for entry in os.listdir('/mnt/'):
+            if os.path.isdir(os.path.join('/mnt/', entry)):
+                directories.append(entry)
+        response["directories"] = directories
+    except OSError as e:
+        response["error"] = str(e)
+
 else:
-    print ("Security : no user authenticated")
+    response["status"] = "not authenticated"
 
+print(json.dumps(response))

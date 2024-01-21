@@ -1,0 +1,40 @@
+{
+  "webservice": {
+    "services": [
+      {
+        "service": "rr-manager",
+        "display_name": "RRManager",
+        "type": "static",
+        "root": "rr-manager",
+        "backend": 2,
+        "icon": "app/images/rr-manager-{0}.png"
+      }
+    ],
+    "migrate": {
+      "root": [
+        {
+          "old": "rr-manager",
+          "new": "rr-manager"
+        }
+      ]
+    },
+    "portals": [
+      {
+        "service": "rr-manager",
+        "type": "alias",
+        "name": "RRManager API Docs",
+        "alias": "rr-manager",
+        "app": "com.synocommunity.packages.rr-manager"
+      }
+    ],
+    "pkg_dir_prepare": [
+      {
+        "source": "/var/packages/rr-manager/target/web/docs/",
+        "target": "rr-manager",
+        "mode": "0755",
+        "user": "sc-rr-manager",
+        "group": "http"
+      }
+    ]
+  }
+}

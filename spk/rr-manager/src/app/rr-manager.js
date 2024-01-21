@@ -1,17 +1,17 @@
 // Namespace definition
-Ext.ns("SYNOCOMMUNITY.SimpleExtJSApp");
+Ext.ns("SYNOCOMMUNITY.RRManager");
 
 // Application definition
-Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppInstance", {
+Ext.define("SYNOCOMMUNITY.RRManager.AppInstance", {
     extend: "SYNO.SDS.AppInstance",
-    appWindowName: "SYNOCOMMUNITY.SimpleExtJSApp.AppWindow",
+    appWindowName: "SYNOCOMMUNITY.RRManager.AppWindow",
     constructor: function() {
         this.callParent(arguments)
     }
 });
 
 // Window definition
-Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
+Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     extend: "SYNO.SDS.AppWindow",
     appInstance: null,
     tabs: null,
@@ -1277,7 +1277,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
     },
 	
     onOpen: function(a) {
-        SYNOCOMMUNITY.SimpleExtJSApp.AppWindow.superclass.onOpen.call(this, a);
+        SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
 
     }
 });

@@ -1,14 +1,14 @@
-PKG_NAME = SimpleExtJSApp
-PKG_VERS = 0.7
+PKG_NAME = RRManager
+PKG_VERS = 0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/DigitalBox98/SimpleExtJSApp/releases/download/v$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/T-REX-XP/RRManager/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = https://github.com/DigitalBox98/
-COMMENT  = A simple ExtJS Application for DSM 
+HOMEPAGE = https://github.com/T-REX-XP/
+COMMENT  = RRManager Application for DSM 
 
 GNU_CONFIGURE = 1
 

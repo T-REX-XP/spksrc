@@ -13,7 +13,7 @@
         }
     },
     "rr-manager.js": {
-        "SYNOCOMMUNITY.SimpleExtJSApp.AppInstance": {
+        "SYNOCOMMUNITY.RRManager.AppInstance": {
             "type": "app",
             "title": "app:app_name",
             "version": "0.1",

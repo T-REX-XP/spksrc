@@ -18,15 +18,7 @@
         }
       ]
     },
-    "portals": [
-      // {
-      //   "service": "rr-manager",
-      //   "type": "alias",
-      //   "name": "RRManager API Docs",
-      //   "alias": "rr-manager",
-      //   "app": "com.synocommunity.packages.rr-manager"
-      // }
-    ],
+    "portals": [],
     "pkg_dir_prepare": [
       {
         "source": "/var/packages/rr-manager/target/web/docs/",

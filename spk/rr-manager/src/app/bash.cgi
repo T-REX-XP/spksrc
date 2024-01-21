@@ -4,14 +4,13 @@ echo -e "Content-type: text/html\n\n"
 
 USER=$(/usr/syno/synoman/webman/modules/authenticate.cgi)
 
-LOADER_DISK_PART3="$(blkid -L RR3 | cut -d':' -f1)"
-LOADER_DISK_PART2="${LOADER_DISK_PART3/3/2}"
-LOADER_DISK_PART1="${LOADER_DISK_PART3/3/1}"
-LOADER_DISK="/dev/$(realpath /sys/block/*/${LOADER_DISK_PART3/\/dev\//} | awk -F'/' '{print $(NF-1)}')"
-
 if [ "${USER}" = "" ]; then
   echo -e "Security : user not authenticated\n"
 else
+  LOADER_DISK_PART3="$(blkid -L RR3 | cut -d':' -f1)"
+  LOADER_DISK_PART2="${LOADER_DISK_PART3/3/2}"
+  LOADER_DISK_PART1="${LOADER_DISK_PART3/3/1}"
+  LOADER_DISK="/dev/$(realpath /sys/block/*/${LOADER_DISK_PART3/\/dev\//} | awk -F'/' '{print $(NF-1)}')"
   #echo -e "Security : user authenticated ${USER}\n"
   # Make folders to mount partitions
   mkdir -p /mnt/p1

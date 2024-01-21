@@ -160,7 +160,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         width: 140
                     }, {
                         xtype: "syno_button",
-                        text: 'Mount Loader',
+                        text: 'Mount Loader Disk',
                         handler: this.onBashCGIClick.bind(this)
                     }]
                 }

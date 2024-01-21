@@ -7,7 +7,7 @@ SUPPORTED_SPKS = $(sort $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile)))
 all: $(SUPPORTED_SPKS)
 
 all-noarch:
-	@for spk in $(sort $(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(sort $(dir $(wildcard spk/simpleextjsapp/Makefile))) ; \
 	do \
 	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
 	done

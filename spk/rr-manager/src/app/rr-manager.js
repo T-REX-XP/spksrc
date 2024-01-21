@@ -160,7 +160,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         width: 140
                     }, {
                         xtype: "syno_button",
-                        text: 'Call bash CGI ',
+                        text: 'Mount Loader',
                         handler: this.onBashCGIClick.bind(this)
                     }]
                 }

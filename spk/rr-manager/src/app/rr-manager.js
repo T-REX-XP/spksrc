@@ -708,7 +708,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Call external API on click
     onExternalAPIClick: function() {
         Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/externalapi.cgi',
+            url: '/webman/3rdparty/rr-manager/externalapi.cgi',
             method: 'GET',
             timeout: 60000,
             params: {
@@ -731,7 +731,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Call bash CGI on click
     onBashCGIClick: function() {
         Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/bash.cgi',
+            url: '/webman/3rdparty/rr-manager/bash.cgi',
             method: 'GET',
             timeout: 60000,
             params: {
@@ -754,7 +754,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Call C CGI on click
     onCGIClick: function() {
         Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/test.cgi',
+            url: '/webman/3rdparty/rr-manager/test.cgi',
             method: 'GET',
             timeout: 60000,
             params: {
@@ -778,7 +778,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Call Python CGI on click
     onPythonCGIClick: function() {
         Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/python.cgi',
+            url: '/webman/3rdparty/rr-manager/python.cgi',
             method: 'GET',
             timeout: 60000,
             params: {
@@ -802,7 +802,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Call Perl CGI on click
     onPerlCGIClick: function() {
         Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/perl.cgi',
+            url: '/webman/3rdparty/rr-manager/perl.cgi',
             method: 'GET',
             timeout: 60000,
             params: {
@@ -865,7 +865,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create JSON Store grid calling python API  
     createGrid: function() {
 
-        var localUrl = "/webman/3rdparty/simpleextjsapp/storepythonsynoapi.cgi";
+        var localUrl = "/webman/3rdparty/rr-manager/storepythonsynoapi.cgi";
 
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
@@ -1089,7 +1089,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create JSON Store grid calling bash API  
     createRatesGrid: function() {
 
-        var localUrl = "/webman/3rdparty/simpleextjsapp/storebashratesapi.cgi";
+        var localUrl = "/webman/3rdparty/rr-manager/storebashratesapi.cgi";
 
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
@@ -1191,7 +1191,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create JSON Store grid calling python SQL API  
     createSqlGrid: function() {
 
-        var localUrl = "/webman/3rdparty/simpleextjsapp/storepythonsqlapi.cgi";
+        var localUrl = "/webman/3rdparty/rr-manager/storepythonsqlapi.cgi";
 
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,

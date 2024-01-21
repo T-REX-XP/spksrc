@@ -1,7 +1,0 @@
-<Config>
-  <Branch>master</Branch>
-  <LaunchBrowser>False</LaunchBrowser>
-  <Port>9696</Port>
-  <UpdateAutomatically>True</UpdateAutomatically>
-  <UpdateMechanism>BuiltIn</UpdateMechanism>
-</Config>

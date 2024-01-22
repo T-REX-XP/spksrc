@@ -90,7 +90,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             height: 640,
             items: [{
                 xtype: 'syno_displayfield',
-                value: 'Welcome to the DSM Demo App! Please choose :'
+                value: 'Welcome to the RR Manager App!'
             },
             {
                 xtype: 'syno_tabpanel',
@@ -119,7 +119,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         value: 'RR Version:',
                         width: 100
                     }, {
-                        xtype: "syno_textfield",
+                        xtype: "syno_displayfield",
                         fieldLabel: "TextField: ",
                         value: "version",
                         id: "lbRrVersion"
@@ -137,6 +137,20 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         btnStyle: "green",
                         text: 'Mount the loader disk',
                         handler: this.onRunTaskMountLoaderDiskClick.bind(this)
+                    }]
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'Run task: ',
+                        width: 140
+                    }, {
+                        xtype: "syno_button",
+                        btnStyle: "red",
+                        text: 'UnMount the loader disk',
+                        handler: this.onRunTaskUnMountLoaderDiskClick.bind(this)
                     }]
                 },
                 {
@@ -624,7 +638,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         //https://help.synology.com/developer-guide/integrate_dsm/config.html
         //https://www.reddit.com/r/synology/comments/18kl287/api_access_issues_with_dsm7_via_php_script/
         var t = 'webapi/entry.cgi?' + 'api=SYNO.Entry.Request&method=request&version=1&stop_when_error=false&mode="sequential"&compound=[{"api":"SYNO.Core.EventScheduler","method":"run","version":1,"task_name":"MountLoaderDisk"}]';
-        debugger;
         Ext.Ajax.request({
             url: t,
             method: 'GET',
@@ -633,7 +646,27 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             success: function (response) {
-                window.alert('API returned raw list  : ' + response.responseText);
+                //  window.alert('API returned raw list  : ' + response.responseText);
+            },
+            failure: function (response) {
+                window.alert('Request Failed to mount loader disk.');
+            }
+        });
+    },
+    onRunTaskUnMountLoaderDiskClick: function () {
+        //https://www.synology.com/en-us/support/developer#tool
+        //https://help.synology.com/developer-guide/integrate_dsm/config.html
+        //https://www.reddit.com/r/synology/comments/18kl287/api_access_issues_with_dsm7_via_php_script/
+        var t = 'webapi/entry.cgi?' + 'api=SYNO.Entry.Request&method=request&version=1&stop_when_error=false&mode="sequential"&compound=[{"api":"SYNO.Core.EventScheduler","method":"run","version":1,"task_name":"UnMountLoaderDisk"}]';
+        Ext.Ajax.request({
+            url: t,
+            method: 'GET',
+            timeout: 60000,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            success: function (response) {
+                window.alert('Loader disk has been unmounted  : ' + response.responseText);
             },
             failure: function (response) {
                 window.alert('Request Failed.');
@@ -785,14 +818,12 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             success: function (response) {
                 var result = response.responseText;
                 var response = JSON.parse(result);
-
                 Ext.getCmp('lbRrVersion').setValue(response.rr_version);
                 console.log('--Response: ', result);
-                window.alert('Python CGI called :\n' + result);
+                // window.alert('Python CGI called :\n' + result);
             },
             failure: function (response) {
                 window.alert('Request Failed.');
-
             }
 
         });
@@ -1274,12 +1305,20 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     onOpen: function (a) {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
+        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+        myMask.show();
+
         console.log("----onOpen");
         //TODO: run mount loader disk task
+        this.onRunTaskMountLoaderDiskClick();
         //TODO: run read rr config api
+        setTimeout(x => {
+            this.onPythonCGIClick();
+            myMask.hide();
+        }, 1000);
+
         //TODO: fix install yaml package for python to read user-config.yml
         //TODO: implement mount/unmount loader disk tasks to call them from the app
-        this.onPythonCGIClick();
     }
 });
 

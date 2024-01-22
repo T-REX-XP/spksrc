@@ -5,7 +5,7 @@ Ext.ns("SYNOCOMMUNITY.RRManager");
 Ext.define("SYNOCOMMUNITY.RRManager.AppInstance", {
     extend: "SYNO.SDS.AppInstance",
     appWindowName: "SYNOCOMMUNITY.RRManager.AppWindow",
-    constructor: function() {
+    constructor: function () {
         this.callParent(arguments)
     }
 });
@@ -15,10 +15,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     extend: "SYNO.SDS.AppWindow",
     appInstance: null,
     tabs: null,
-    constructor: function(config) {
+    constructor: function (config) {
         this.appInstance = config.appInstance;
 
-        this.tabs = (function() {
+        this.tabs = (function () {
             var allTabs = [];
 
             // Tab for CGI or API calls
@@ -27,7 +27,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 items: [
                     this.createDisplayCGI(),
                     this.createDisplayAPI(),
-                    this.createDisplayExternalAPI()
+                    // this.createDisplayExternalAPI()
                 ]
             });
 
@@ -65,7 +65,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 layout: "fit",
                 items: [
                     this.createSynoStore(),
-					this.createSqlStore()
+                    this.createSqlStore()
                 ]
             });
 
@@ -75,10 +75,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 layout: "fit",
                 items: [
                     this.createSynoAPIStore(),
-					this.createRatesStore()
+                    this.createRatesStore()
                 ]
             });
-            
+
             return allTabs;
         }).call(this);
 
@@ -89,126 +89,126 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             width: 640,
             height: 640,
             items: [{
-                    xtype: 'syno_displayfield',
-                    value: 'Welcome to the DSM Demo App! Please choose :'
-                },
-                {
-                    xtype: 'syno_tabpanel',
-                    activeTab: 0,
-                    plain: true,
-                    items: this.tabs,
-                    deferredRender: true
-                }
+                xtype: 'syno_displayfield',
+                value: 'Welcome to the DSM Demo App! Please choose :'
+            },
+            {
+                xtype: 'syno_tabpanel',
+                activeTab: 0,
+                plain: true,
+                items: this.tabs,
+                deferredRender: true
+            }
             ]
         }, config);
 
         this.callParent([config]);
     },
     // Create the display of CGI calls
-    createDisplayCGI: function() {
+    createDisplayCGI: function () {
         return new SYNO.ux.FieldSet({
             title: "Call to CGI",
             collapsible: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'CGI in C :',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "green",
-                        text: 'Call C CGI ',
-                        handler: this.onCGIClick.bind(this)
-                    }]
-                },
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'CGI in Perl :',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "red",
-                        text: 'Call Perl CGI ',
-                        handler: this.onPerlCGIClick.bind(this)
-                    }]
-                },
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'CGI in Python :',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "blue",
-                        text: 'Call Python CGI ',
-                        handler: this.onPythonCGIClick.bind(this)
-                    }]
-                },
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'CGI in bash :',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        text: 'Mount Loader Disk',
-                        handler: this.onBashCGIClick.bind(this)
-                    }]
-                }
-            ]
-        });
-    },
-    // Create the display of API calls
-    createDisplayAPI: function() {
-        return new SYNO.ux.FieldSet({
-            title: "Call to Syno API",
-            collapsible: true,
-            items: 
-			[
-				// Core System API
-				{
                 xtype: "syno_compositefield",
                 hideLabel: true,
                 items: [{
                     xtype: 'syno_displayfield',
-                    value: 'Core.System',
+                    value: 'CGI in C :',
                     width: 140
-                	}, {
+                }, {
                     xtype: "syno_button",
                     btnStyle: "green",
-                    text: 'Call API ',
-                    handler: this.onAPIClick.bind(this)
-                	}]
-             },
-			 // Core Storage API
-			 {
-			                 xtype: "syno_compositefield",
-			                 hideLabel: true,
-			                 items: [{
-			                     xtype: 'syno_displayfield',
-			                     value: 'Core.Storage.Volume',
-			                     width: 140
-			                 	}, {
-			                     xtype: "syno_button",
-			                     btnStyle: "green",
-			                     text: 'Call API ',
-			                     handler: this.onAPIStorageClick.bind(this)
-			                 	}]
-			              }
-			]
+                    text: 'Call C CGI ',
+                    handler: this.onCGIClick.bind(this)
+                }]
+            },
+            {
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'CGI in Perl :',
+                    width: 140
+                }, {
+                    xtype: "syno_button",
+                    btnStyle: "red",
+                    text: 'Call Perl CGI ',
+                    handler: this.onPerlCGIClick.bind(this)
+                }]
+            },
+            {
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'CGI in Python :',
+                    width: 140
+                }, {
+                    xtype: "syno_button",
+                    btnStyle: "blue",
+                    text: 'Read RR User Config',
+                    handler: this.onPythonCGIClick.bind(this)
+                }]
+            },
+            {
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'CGI in bash :',
+                    width: 140
+                }, {
+                    xtype: "syno_button",
+                    text: 'Mount Loader Disk',
+                    handler: this.onBashCGIClick.bind(this)
+                }]
+            }
+            ]
+        });
+    },
+    // Create the display of API calls
+    createDisplayAPI: function () {
+        return new SYNO.ux.FieldSet({
+            title: "Call to Syno API",
+            collapsible: true,
+            items:
+                [
+                    // Core System API
+                    {
+                        xtype: "syno_compositefield",
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Core.System',
+                            width: 140
+                        }, {
+                            xtype: "syno_button",
+                            btnStyle: "green",
+                            text: 'Mount the loader disk',
+                            handler: this.onRunTaskMountLoaderDiskClick.bind(this)
+                        }]
+                    },
+                    // Core Storage API
+                    {
+                        xtype: "syno_compositefield",
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Core.Storage.Volume',
+                            width: 140
+                        }, {
+                            xtype: "syno_button",
+                            btnStyle: "green",
+                            text: 'Call API ',
+                            handler: this.onAPIStorageClick.bind(this)
+                        }]
+                    }
+                ]
         });
     },
     // Create the display of external API calls
-    createDisplayExternalAPI: function() {
+    createDisplayExternalAPI: function () {
         return new SYNO.ux.FieldSet({
             title: "Call to external API",
             collapsible: true,
@@ -229,7 +229,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     // Create the display of Form Components / Standard
-    createStandardGUI: function() {
+    createStandardGUI: function () {
         return new SYNO.ux.FieldSet({
             title: "Standard",
             collapsible: true,
@@ -282,22 +282,22 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'DateTime :',
-                            width: 100
-                        },
-                        {
-                            xtype: "syno_datetimefield",
-                            name: "searchdatefrom",
-                            editable: !1,
-                            emptyText: "date_from",
-                            hideClearButton: !0,
-                            listeners: {
-                                select: function(e, t) {
-                                    // put logic here 
-                                }
+                        xtype: 'syno_displayfield',
+                        value: 'DateTime :',
+                        width: 100
+                    },
+                    {
+                        xtype: "syno_datetimefield",
+                        name: "searchdatefrom",
+                        editable: !1,
+                        emptyText: "date_from",
+                        hideClearButton: !0,
+                        listeners: {
+                            select: function (e, t) {
+                                // put logic here 
                             }
                         }
+                    }
                     ]
                 },
                 // Date
@@ -305,22 +305,22 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Date :',
-                            width: 100
-                        },
-                        {
-                            xtype: "syno_datefield",
-                            name: "searchddateto",
-                            editable: !1,
-                            emptyText: "date_to",
-                            hideClearButton: !0,
-                            listeners: {
-                                select: function(e, t) {
-                                    // put logic here 
-                                }
+                        xtype: 'syno_displayfield',
+                        value: 'Date :',
+                        width: 100
+                    },
+                    {
+                        xtype: "syno_datefield",
+                        name: "searchddateto",
+                        editable: !1,
+                        emptyText: "date_to",
+                        hideClearButton: !0,
+                        listeners: {
+                            select: function (e, t) {
+                                // put logic here 
                             }
                         }
+                    }
                     ]
                 },
                 // NumberField
@@ -328,18 +328,18 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Number :',
-                            width: 100
-                        },
-                        {
-                            xtype: "syno_numberfield",
-                            name: "columnNumber",
-                            value: "45",
-                            width: 60,
-                            minValue: 2,
-                            maxValue: 512
-                        }
+                        xtype: 'syno_displayfield',
+                        value: 'Number :',
+                        width: 100
+                    },
+                    {
+                        xtype: "syno_numberfield",
+                        name: "columnNumber",
+                        value: "45",
+                        width: 60,
+                        minValue: 2,
+                        maxValue: 512
+                    }
                     ]
                 },
                 // Combobox            
@@ -415,7 +415,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     // Create the display of Form Components / Advanced
-    createAdvancedGUI: function() {
+    createAdvancedGUI: function () {
         return new SYNO.ux.FieldSet({
             title: "Advanced",
             collapsible: true,
@@ -426,23 +426,23 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'SplitButton',
-                            width: 100
-                        },
-                        {
-                            xtype: "syno_splitbutton",
-                            text: "export",
-                            menu: {
-                                items: [{
-                                    text: "HTML type",
-                                    handler: {}
-                                }, {
-                                    text: "CSV_type",
-                                    handler: {}
-                                }]
-                            }
+                        xtype: 'syno_displayfield',
+                        value: 'SplitButton',
+                        width: 100
+                    },
+                    {
+                        xtype: "syno_splitbutton",
+                        text: "export",
+                        menu: {
+                            items: [{
+                                text: "HTML type",
+                                handler: {}
+                            }, {
+                                text: "CSV_type",
+                                handler: {}
+                            }]
                         }
+                    }
                     ]
                 },
                 // ColorField
@@ -450,15 +450,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'ColorField',
-                            width: 100
-                        },
+                        xtype: 'syno_displayfield',
+                        value: 'ColorField',
+                        width: 100
+                    },
 
-                        {
-                            xtype: "syno_colorfield",
-                            value: "#993300"
-                        }
+                    {
+                        xtype: "syno_colorfield",
+                        value: "#993300"
+                    }
                     ]
                 },
                 // Switch
@@ -466,15 +466,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Switch',
-                            width: 100
-                        },
+                        xtype: 'syno_displayfield',
+                        value: 'Switch',
+                        width: 100
+                    },
 
-                        {
-                            xtype: "syno_switch",
-							width: 80
-                        }
+                    {
+                        xtype: "syno_switch",
+                        width: 80
+                    }
                     ]
                 },
                 // TimeField
@@ -482,15 +482,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     xtype: "syno_compositefield",
                     hideLabel: true,
                     items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'TimeField',
-                            width: 100
-                        },
+                        xtype: 'syno_displayfield',
+                        value: 'TimeField',
+                        width: 100
+                    },
 
-                        {
-                            xtype: "syno_timefield",
-                            value: "test",
-                        }
+                    {
+                        xtype: "syno_timefield",
+                        value: "test",
+                    }
                     ]
                 }
 
@@ -499,55 +499,55 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     // Create the display of Menu & Toolbar Components / Standard
-    createMenuGUI: function() {
+    createMenuGUI: function () {
         return new SYNO.ux.FieldSet({
             title: "Standard",
             collapsible: true,
             autoHeight: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Menu :',
-                            width: 100
-                        },
-                        {
-                            xtype: "syno_button",
-                            text: "Menu button",
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'Menu :',
+                    width: 100
+                },
+                {
+                    xtype: "syno_button",
+                    text: "Menu button",
+                    menu: {
+                        items: [{
+                            text: "Undo",
+                            disabled: true
+                        }, {
+                            text: "Redo",
+                            disabled: true
+                        }, {
+                            xtype: "menuseparator"
+                        }, {
+                            text: "Select All",
+                            disabled: false
+                        }, {
+                            xtype: "menuseparator"
+                        }, {
+                            text: "Lang",
+                            hideOnClick: false,
+                            disabled: false,
                             menu: {
+                                xtype: "syno_menu",
                                 items: [{
-                                    text: "Undo",
-                                    disabled: true
+                                    text: "FR"
                                 }, {
-                                    text: "Redo",
-                                    disabled: true
-                                }, {
-                                    xtype: "menuseparator"
-                                }, {
-                                    text: "Select All",
-                                    disabled: false
-                                }, {
-                                    xtype: "menuseparator"
-                                }, {
-                                    text: "Lang",
-                                    hideOnClick: false,
-                                    disabled: false,
-                                    menu: {
-                                        xtype: "syno_menu",
-                                        items: [{
-                                            text: "FR"
-                                        }, {
-                                            text: "US"
-                                        }]
-                                    }
+                                    text: "US"
                                 }]
                             }
-                        }
-
-
-                    ]
+                        }]
+                    }
                 }
+
+
+                ]
+            }
 
 
 
@@ -556,28 +556,28 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create the display of User Interaction
-    createInteraction: function() {
+    createInteraction: function () {
         return new SYNO.ux.FieldSet({
             title: "Standard",
             collapsible: true,
             autoHeight: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'ModalWindow',
-                            width: 100
-                        },
-                        {
-                            xtype: "syno_button",
-                            text: 'Open window',
-                            handler: this.onModalButtonClick.bind(this)
-                        }
-
-
-                    ]
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'ModalWindow',
+                    width: 100
+                },
+                {
+                    xtype: "syno_button",
+                    text: 'Open window',
+                    handler: this.onModalButtonClick.bind(this)
                 }
+
+
+                ]
+            }
 
 
 
@@ -586,7 +586,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Handle display for ModalWindow
-    onModalButtonClick: function() {
+    onModalButtonClick: function () {
 
         var window = new SYNO.SDS.ModalWindow({
             closeAction: "hide",
@@ -597,25 +597,25 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             title: "Make a choice",
             buttons: [{
                 text: "Cancel",
-				// Handle Cancel
-                handler: function() {
+                // Handle Cancel
+                handler: function () {
                     window.close();
                 }
             }, {
                 text: "Confirm",
                 itemId: "confirm",
                 btnStyle: "blue",
-				// Handle Confirm
-                handler: function() {
+                // Handle Confirm
+                handler: function () {
                     window.close();
                 }
             }],
             items: [{
 
-                    xtype: 'syno_displayfield',
-                    value: 'Do you want to continue the demo ?',
+                xtype: 'syno_displayfield',
+                value: 'Do you want to continue the demo ?',
 
-                }
+            }
 
             ],
 
@@ -626,7 +626,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create the content for the ComboBox
-    createTimeItemStore: function(e) {
+    createTimeItemStore: function (e) {
         var a = [];
         var c = {
             hour: 24,
@@ -645,9 +645,30 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         }
         return null
     },
+    onRunTaskMountLoaderDiskClick: function () {
+        //https://www.synology.com/en-us/support/developer#tool
+        //https://help.synology.com/developer-guide/integrate_dsm/config.html
+        //https://www.reddit.com/r/synology/comments/18kl287/api_access_issues_with_dsm7_via_php_script/
+        var t ='webapi/entry.cgi?'+'api=SYNO.Entry.Request&method=request&version=1&stop_when_error=false&mode="sequential"&compound=[{"api":"SYNO.Core.EventScheduler","method":"run","version":1,"task_name":"MountLoaderDisk"}]';
+        debugger;
+        Ext.Ajax.request({
+            url: t,
+            method: 'GET',
+            timeout: 60000,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            success: function (response) {
+                window.alert('API returned raw list  : ' + response.responseText);
+            },
+            failure: function (response) {
+                window.alert('Request Failed.');
+            }
+        });
+    },
     // Call Syno Core API on click
-    onAPIClick: function() {
-        var t = this.getBaseURL({			
+    onAPIClick: function () {
+        var t = this.getBaseURL({
             api: "SYNO.Core.System",
             method: "info",
             version: 3
@@ -659,25 +680,25 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'application/json'
             },
-            success: function(response) {
+            success: function (response) {
                 var data = Ext.decode(response.responseText).data;
-				var cpu_family = data.cpu_family;
+                var cpu_family = data.cpu_family;
                 var cpu_clock = data.cpu_clock_speed;
-				var ram_size = data.ram_size;
-				var firmware_ver = data.firmware_ver;
+                var ram_size = data.ram_size;
+                var firmware_ver = data.firmware_ver;
                 var temp = data.sys_temp;
                 window.alert('API returned info : cpu family = ' + cpu_family + ', cpu clock speed = ' + cpu_clock + ', ram size = ' + ram_size + ', temperature = ' + temp + ', firmware ver = ' + firmware_ver);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
         });
 
-    },    
-	// Call Syno Storage API on click
-    onAPIStorageClick: function() {
-        var t = this.getBaseURL({			
+    },
+    // Call Syno Storage API on click
+    onAPIStorageClick: function () {
+        var t = this.getBaseURL({
             api: "SYNO.Core.Storage.Volume",
             method: "list",
             params: {
@@ -695,10 +716,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'application/json'
             },
-            success: function(response) {
-				window.alert('API returned raw list  : ' + response.responseText);
+            success: function (response) {
+                window.alert('API returned raw list  : ' + response.responseText);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
@@ -706,7 +727,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     },
     // Call external API on click
-    onExternalAPIClick: function() {
+    onExternalAPIClick: function () {
         Ext.Ajax.request({
             url: '/webman/3rdparty/rr-manager/externalapi.cgi',
             method: 'GET',
@@ -717,11 +738,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'text/html'
             },
-            success: function(response) {
+            success: function (response) {
                 var result = response.responseText;
                 window.alert('External API called : ' + result);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
@@ -729,7 +750,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     // Call bash CGI on click
-    onBashCGIClick: function() {
+    onBashCGIClick: function () {
         Ext.Ajax.request({
             url: '/webman/3rdparty/rr-manager/bash.cgi',
             method: 'GET',
@@ -740,11 +761,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'text/html'
             },
-            success: function(response) {
+            success: function (response) {
                 var result = response.responseText;
                 window.alert('Bash CGI called : ' + result);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
@@ -752,7 +773,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     // Call C CGI on click
-    onCGIClick: function() {
+    onCGIClick: function () {
         Ext.Ajax.request({
             url: '/webman/3rdparty/rr-manager/test.cgi',
             method: 'GET',
@@ -763,11 +784,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'text/html'
             },
-            success: function(response) {
+            success: function (response) {
                 var result = response.responseText;
                 window.alert('C CGI called :\n' + result);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
@@ -776,7 +797,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     },
     // Call Python CGI on click
-    onPythonCGIClick: function() {
+    onPythonCGIClick: function () {
         Ext.Ajax.request({
             url: '/webman/3rdparty/rr-manager/python.cgi',
             method: 'GET',
@@ -787,11 +808,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'text/html'
             },
-            success: function(response) {
+            success: function (response) {
                 var result = response.responseText;
                 window.alert('Python CGI called :\n' + result);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
@@ -800,7 +821,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     },
     // Call Perl CGI on click
-    onPerlCGIClick: function() {
+    onPerlCGIClick: function () {
         Ext.Ajax.request({
             url: '/webman/3rdparty/rr-manager/perl.cgi',
             method: 'GET',
@@ -811,11 +832,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             headers: {
                 'Content-Type': 'text/html'
             },
-            success: function(response) {
+            success: function (response) {
                 var result = response.responseText;
                 window.alert('Perl CGI called :\n' + result);
             },
-            failure: function(response) {
+            failure: function (response) {
                 window.alert('Request Failed.');
 
             }
@@ -827,7 +848,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     //
 
     // Grid search 
-    createFilter: function(gridStore) {
+    createFilter: function (gridStore) {
         var searchField = new SYNO.ux.TextFilter({
             emptyText: "Search",
             store: gridStore,
@@ -843,27 +864,27 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create the display of Syno Store
-    createSynoStore: function() {
+    createSynoStore: function () {
         return new SYNO.ux.FieldSet({
             title: "Python Package Store",
             collapsible: true,
             autoHeight: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [
-						this.createGrid()
-                    ]
-                }
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [
+                    this.createGrid()
+                ]
+            }
 
 
 
             ]
         });
     },
-	
+
     // Create JSON Store grid calling python API  
-    createGrid: function() {
+    createGrid: function () {
 
         var localUrl = "/webman/3rdparty/rr-manager/storepythonsynoapi.cgi";
 
@@ -919,10 +940,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 forceFit: true,
                 onLoad: Ext.emptyFn,
                 listeners: {
-                    beforerefresh: function(f) {
+                    beforerefresh: function (f) {
                         f.scrollTop = f.scroller.dom.scrollTop;
                     },
-                    refresh: function(f) {
+                    refresh: function (f) {
                         f.scroller.dom.scrollTop = f.scrollTop;
                     }
                 }
@@ -934,7 +955,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,
-                render: function(grid) {
+                render: function (grid) {
                     grid.getStore().load({
                         params: {
                             offset: 0,
@@ -952,18 +973,18 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
 
     // Create the display of API Store
-    createSynoAPIStore: function() {
+    createSynoAPIStore: function () {
         return new SYNO.ux.FieldSet({
             title: "Syno API Store",
             collapsible: true,
             autoHeight: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [
-						this.createAPIGrid()
-                    ]
-                }
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [
+                    this.createAPIGrid()
+                ]
+            }
 
 
 
@@ -972,7 +993,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create API Store grid calling Syno API  
-    createAPIGrid: function() {
+    createAPIGrid: function () {
 
         var APIName = "SYNO.Core.TaskScheduler";
 
@@ -998,7 +1019,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             },
             autoDestroy: false,
             autoLoad: false
-        });    
+        });
 
         var paging = new SYNO.ux.PagingToolbar({
             store: gridStore,
@@ -1034,10 +1055,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 forceFit: true,
                 onLoad: Ext.emptyFn,
                 listeners: {
-                    beforerefresh: function(f) {
+                    beforerefresh: function (f) {
                         f.scrollTop = f.scroller.dom.scrollTop;
                     },
-                    refresh: function(f) {
+                    refresh: function (f) {
                         f.scroller.dom.scrollTop = f.scrollTop;
                     }
                 }
@@ -1049,7 +1070,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,
-                render: function(grid) {
+                render: function (grid) {
                     grid.getStore().load({
                         params: {
                             offset: 0,
@@ -1064,21 +1085,21 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         return new SYNO.ux.GridPanel(c);
 
     },
-	
-    
+
+
     // Create the display of Rates Store
-    createRatesStore: function() {
+    createRatesStore: function () {
         return new SYNO.ux.FieldSet({
             title: "Bash Rates Store",
             collapsible: true,
             autoHeight: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [
-						this.createRatesGrid()
-                    ]
-                }
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [
+                    this.createRatesGrid()
+                ]
+            }
 
 
 
@@ -1087,7 +1108,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create JSON Store grid calling bash API  
-    createRatesGrid: function() {
+    createRatesGrid: function () {
 
         var localUrl = "/webman/3rdparty/rr-manager/storebashratesapi.cgi";
 
@@ -1136,10 +1157,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 forceFit: true,
                 onLoad: Ext.emptyFn,
                 listeners: {
-                    beforerefresh: function(f) {
+                    beforerefresh: function (f) {
                         f.scrollTop = f.scroller.dom.scrollTop;
                     },
-                    refresh: function(f) {
+                    refresh: function (f) {
                         f.scroller.dom.scrollTop = f.scrollTop;
                     }
                 }
@@ -1151,7 +1172,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,
-                render: function(grid) {
+                render: function (grid) {
                     grid.getStore().load({
                         params: {
                             offset: 0,
@@ -1169,18 +1190,18 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
 
     // Create the display of SQL Store
-    createSqlStore: function() {
+    createSqlStore: function () {
         return new SYNO.ux.FieldSet({
             title: "Python SQLite Store",
             collapsible: true,
             autoHeight: true,
             items: [{
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [
-						this.createSqlGrid()
-                    ]
-                }
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [
+                    this.createSqlGrid()
+                ]
+            }
 
 
 
@@ -1189,7 +1210,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create JSON Store grid calling python SQL API  
-    createSqlGrid: function() {
+    createSqlGrid: function () {
 
         var localUrl = "/webman/3rdparty/rr-manager/storepythonsqlapi.cgi";
 
@@ -1245,10 +1266,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 forceFit: true,
                 onLoad: Ext.emptyFn,
                 listeners: {
-                    beforerefresh: function(f) {
+                    beforerefresh: function (f) {
                         f.scrollTop = f.scroller.dom.scrollTop;
                     },
-                    refresh: function(f) {
+                    refresh: function (f) {
                         f.scroller.dom.scrollTop = f.scrollTop;
                     }
                 }
@@ -1260,7 +1281,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,
-                render: function(grid) {
+                render: function (grid) {
                     grid.getStore().load({
                         params: {
                             offset: 0,
@@ -1270,17 +1291,12 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 }
             }
         };
-
-
         return new SYNO.ux.GridPanel(c);
-
     },
-	
-    onOpen: function(a) {
-        SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
-        debugger;
-        console.log("----onOpen");
 
+    onOpen: function (a) {
+        SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
+        console.log("----onOpen");
     }
 });
 

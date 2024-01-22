@@ -107,63 +107,52 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create the display of CGI calls
     createDisplayCGI: function () {
         return new SYNO.ux.FieldSet({
-            title: "Call to CGI",
+            title: "General",
             collapsible: true,
-            items: [{
-                xtype: "syno_compositefield",
-                hideLabel: true,
-                items: [{
-                    xtype: 'syno_displayfield',
-                    value: 'CGI in C :',
-                    width: 140
-                }, {
-                    xtype: "syno_button",
-                    btnStyle: "green",
-                    text: 'Call C CGI ',
-                    handler: this.onCGIClick.bind(this)
-                }]
-            },
-            {
-                xtype: "syno_compositefield",
-                hideLabel: true,
-                items: [{
-                    xtype: 'syno_displayfield',
-                    value: 'CGI in Perl :',
-                    width: 140
-                }, {
-                    xtype: "syno_button",
-                    btnStyle: "red",
-                    text: 'Call Perl CGI ',
-                    handler: this.onPerlCGIClick.bind(this)
-                }]
-            },
-            {
-                xtype: "syno_compositefield",
-                hideLabel: true,
-                items: [{
-                    xtype: 'syno_displayfield',
-                    value: 'CGI in Python :',
-                    width: 140
-                }, {
-                    xtype: "syno_button",
-                    btnStyle: "blue",
-                    text: 'Read RR User Config',
-                    handler: this.onPythonCGIClick.bind(this)
-                }]
-            },
-            {
-                xtype: "syno_compositefield",
-                hideLabel: true,
-                items: [{
-                    xtype: 'syno_displayfield',
-                    value: 'CGI in bash :',
-                    width: 140
-                }, {
-                    xtype: "syno_button",
-                    text: 'Mount Loader Disk',
-                    handler: this.onBashCGIClick.bind(this)
-                }]
-            }
+            items: [
+                // TextField
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'RR Version:',
+                        width: 100
+                    }, {
+                        xtype: "syno_textfield",
+                        fieldLabel: "TextField: ",
+                        value: "version",
+                        id: "lbRrVersion"
+                    }]
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'Run task: ',
+                        width: 140
+                    }, {
+                        xtype: "syno_button",
+                        btnStyle: "green",
+                        text: 'Mount the loader disk',
+                        handler: this.onRunTaskMountLoaderDiskClick.bind(this)
+                    }]
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'Get RR config:',
+                        width: 140
+                    }, {
+                        xtype: "syno_button",
+                        btnStyle: "blue",
+                        text: 'Read RR User Config',
+                        handler: this.onPythonCGIClick.bind(this)
+                    }]
+                }
             ]
         });
     },
@@ -174,21 +163,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             collapsible: true,
             items:
                 [
-                    // Core System API
-                    {
-                        xtype: "syno_compositefield",
-                        hideLabel: true,
-                        items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Core.System',
-                            width: 140
-                        }, {
-                            xtype: "syno_button",
-                            btnStyle: "green",
-                            text: 'Mount the loader disk',
-                            handler: this.onRunTaskMountLoaderDiskClick.bind(this)
-                        }]
-                    },
                     // Core Storage API
                     {
                         xtype: "syno_compositefield",
@@ -649,7 +623,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         //https://www.synology.com/en-us/support/developer#tool
         //https://help.synology.com/developer-guide/integrate_dsm/config.html
         //https://www.reddit.com/r/synology/comments/18kl287/api_access_issues_with_dsm7_via_php_script/
-        var t ='webapi/entry.cgi?'+'api=SYNO.Entry.Request&method=request&version=1&stop_when_error=false&mode="sequential"&compound=[{"api":"SYNO.Core.EventScheduler","method":"run","version":1,"task_name":"MountLoaderDisk"}]';
+        var t = 'webapi/entry.cgi?' + 'api=SYNO.Entry.Request&method=request&version=1&stop_when_error=false&mode="sequential"&compound=[{"api":"SYNO.Core.EventScheduler","method":"run","version":1,"task_name":"MountLoaderDisk"}]';
         debugger;
         Ext.Ajax.request({
             url: t,
@@ -810,6 +784,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             },
             success: function (response) {
                 var result = response.responseText;
+                var response = JSON.parse(result);
+
+                Ext.getCmp('lbRrVersion').setValue(response.rr_version);
+                console.log('--Response: ', result);
                 window.alert('Python CGI called :\n' + result);
             },
             failure: function (response) {
@@ -1297,6 +1275,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     onOpen: function (a) {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         console.log("----onOpen");
+        //TODO: run mount loader disk task
+        //TODO: run read rr config api
+        //TODO: fix install yaml package for python to read user-config.yml
+        //TODO: implement mount/unmount loader disk tasks to call them from the app
+        this.onPythonCGIClick();
     }
 });
 

@@ -7,7 +7,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
-BUILD_DEPENDS = native/python3
 
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.7.7"

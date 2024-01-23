@@ -2,7 +2,7 @@
 
 import os
 import json
-# import yaml
+import yaml
 
 print("Content-type: application/json\n")
 
@@ -14,13 +14,13 @@ def read_rr_version():
     except IOError as e:
         return f"Error reading RR_VERSION: {e}"
 
-# Function to read user configuration from a YAML file
-# def read_user_config():
-#     try:
-#         with open('/tmp/p2/user-config.yml', 'r') as file:
-#             return yaml.safe_load(file)  # Load and parse the YAML file
-#     except IOError as e:
-#         return f"Error reading user-config.yml: {e}"
+#Function to read user configuration from a YAML file
+def read_user_config():
+    try:
+        with open('/tmp/p2/user-config.yml', 'r') as file:
+            return yaml.safe_load(file)  # Load and parse the YAML file
+    except IOError as e:
+        return f"Error reading user-config.yml: {e}"
 
 # Authenticate the user
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
@@ -34,7 +34,7 @@ if len(user) > 0:
 
     # Read and add rr_version to the response
     response["rr_version"] = read_rr_version()
-    # response["user_config"] = read_user_config()
+    response["user_config"] = read_user_config()
 
     # Listing directories in /mnt/
     directories = []

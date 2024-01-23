@@ -8,9 +8,7 @@ DSM_UI_DIR = app
 #BUILD_DEPENDS = cross/python310
 SPK_DEPENDS = "python310"
 DEPENDS = cross/$(SPK_NAME)
-DEPENDS += cross/libyaml
-DEPENDS += cross/pyyaml
-WHEELS = src/requirements-crossenv.txt
+#WHEELS = src/requirements-crossenv.txt
 
 MAINTAINER = T-REX-XP
 

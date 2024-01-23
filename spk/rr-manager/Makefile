@@ -9,7 +9,7 @@ DEPENDS = cross/$(SPK_NAME)
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
 
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python3>=3.7.7"
+SPK_DEPENDS = "python39"
 
 MAINTAINER = T-REX-XP
 

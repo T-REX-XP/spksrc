@@ -6,6 +6,34 @@ SynoCommunity is now on Discord!
 # DSM 7
 DSM 7 was released on June 29 2021 as Version 7.0.41890.
 
+# Mount loader disk
+Create folowing tasks manually that must be runned behalf of `root`:
+
+- MountLoaderDisk:
+
+```bash
+mkdir -p /tmp/p2
+mkdir -p /tmp/p3
+cd /dev
+mount synoboot1 /tmp/p2 2>/dev/null
+mount synoboot2 /tmp/p3 2>/dev/null
+```
+
+- UnMountLoaderDisk:
+
+```bash
+umount /tmp/p1
+umount /tmp/p2
+umount /tmp/p3
+
+rm -rf /tmp/p1
+rm -rf /tmp/p2
+rm -rf /tmp/p3
+
+
+```
+
+
 ## In SynoCommunity some packages are available for DSM 7 but some are not.
 * You find the status of the packages in the issue [#4524] **Meta: DSM7 package status**
 * If you are running DSM7, some packages that are not compatible may continue appear in the Package Center of your Disk Station.

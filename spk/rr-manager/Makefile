@@ -6,6 +6,7 @@ WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
+DEPENDS += cross/pyyaml
 
 MAINTAINER = T-REX-XP
 

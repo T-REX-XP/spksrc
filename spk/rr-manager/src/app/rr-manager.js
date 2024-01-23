@@ -125,34 +125,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         id: "lbRrVersion"
                     }]
                 },
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'Run task: ',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "green",
-                        text: 'Mount the loader disk',
-                        handler: this.onRunTaskMountLoaderDiskClick.bind(this)
-                    }]
-                },
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'Run task: ',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "red",
-                        text: 'UnMount the loader disk',
-                        handler: this.onRunTaskUnMountLoaderDiskClick.bind(this)
-                    }]
-                },
+               
                 {
                     xtype: "syno_compositefield",
                     hideLabel: true,
@@ -173,10 +146,38 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create the display of API calls
     createDisplayAPI: function () {
         return new SYNO.ux.FieldSet({
-            title: "Call to Syno API",
+            title: "RR Loader Actions",
             collapsible: true,
             items:
                 [
+                    {
+                        xtype: "syno_compositefield",
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Run task: ',
+                            width: 140
+                        }, {
+                            xtype: "syno_button",
+                            btnStyle: "green",
+                            text: 'Mount the loader disk',
+                            handler: this.onRunTaskMountLoaderDiskClick.bind(this)
+                        }]
+                    },
+                    {
+                        xtype: "syno_compositefield",
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Run task: ',
+                            width: 140
+                        }, {
+                            xtype: "syno_button",
+                            btnStyle: "red",
+                            text: 'UnMount the loader disk',
+                            handler: this.onRunTaskUnMountLoaderDiskClick.bind(this)
+                        }]
+                    },
                     // Core Storage API
                     {
                         xtype: "syno_compositefield",
@@ -654,9 +655,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     onRunTaskUnMountLoaderDiskClick: function () {
-        //https://www.synology.com/en-us/support/developer#tool
-        //https://help.synology.com/developer-guide/integrate_dsm/config.html
-        //https://www.reddit.com/r/synology/comments/18kl287/api_access_issues_with_dsm7_via_php_script/
         var t = 'webapi/entry.cgi?' + 'api=SYNO.Entry.Request&method=request&version=1&stop_when_error=false&mode="sequential"&compound=[{"api":"SYNO.Core.EventScheduler","method":"run","version":1,"task_name":"UnMountLoaderDisk"}]';
         Ext.Ajax.request({
             url: t,

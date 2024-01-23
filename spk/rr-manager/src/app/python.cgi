@@ -9,7 +9,7 @@ print("Content-type: application/json\n")
 # Function to read rr_version from a file
 def read_rr_version():
     try:
-        with open('/tmp/p2/RR_VERSION', 'r') as file:
+        with open('/mnt/loader1/RR_VERSION', 'r') as file:
             return file.read().strip()  # Read and strip newline characters
     except IOError as e:
         return f"Error reading RR_VERSION: {e}"

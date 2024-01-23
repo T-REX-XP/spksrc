@@ -5,10 +5,8 @@ SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
 
-# DEPENDS = cross/$(SPK_NAME)
-PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
-
-WHEELS = src/requirements.txt
+DEPENDS = cross/$(SPK_NAME)
+# WHEELS = src/requirements.txt
 
 MAINTAINER = T-REX-XP
 

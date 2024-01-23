@@ -5,7 +5,7 @@ SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python310
+#BUILD_DEPENDS = cross/python310
 SPK_DEPENDS = "python310"
 DEPENDS = cross/$(SPK_NAME)
 DEPENDS += cross/libyaml

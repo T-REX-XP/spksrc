@@ -1,0 +1,5 @@
+bin:bin/domoticz
+rsc:www
+rsc:Config
+rsc:scripts
+rsc:var

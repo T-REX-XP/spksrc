@@ -1,0 +1,3 @@
+lnk:lib/libtorrent.so
+lnk:lib/libtorrent.so.21
+lib:lib/libtorrent.so.21.0.0

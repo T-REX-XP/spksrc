@@ -6,7 +6,10 @@ WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
-# WHEELS = src/requirements.txt
+WHEELS = src/requirements.txt
+
+PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.5-8"
 
 MAINTAINER = T-REX-XP
 

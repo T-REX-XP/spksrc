@@ -34,7 +34,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: rr-manager_extra_install
 rr-manager_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/var
-	install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/
+	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse
 
 	install -m 755 -d $(STAGING_DIR)/app/
 	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi

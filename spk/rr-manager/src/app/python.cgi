@@ -22,7 +22,7 @@ def read_user_config():
     except IOError as e:
         return f"Error reading user-config.yml: {e}"
     except e:
-        return e
+        return "{}"
 # Authenticate the user
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()

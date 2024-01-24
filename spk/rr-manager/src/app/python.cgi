@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/volume1/\@appstore/rr-manager/env/bin/python
+###/usr/bin/python
 
 import os
 import json

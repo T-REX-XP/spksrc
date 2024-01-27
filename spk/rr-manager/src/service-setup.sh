@@ -10,5 +10,6 @@ service_postinst ()
 
     echo ${separator}
     install_python_wheels
+    pip install --target ${SYNOPKG_PKGDEST}/app/libs/ -r .\requirements.txt
     /bin/sqlite3 ${SYNOPKG_PKGHOME}/api.db <${SYNOPKG_PKGDEST}/app/createsqlitedata.sql
 }

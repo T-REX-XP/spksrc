@@ -1,13 +1,17 @@
-#!/volume1/\@appstore/rr-manager/env/bin/python
-###/usr/bin/python
+#!/usr/bin/python
 
 import os
 import json
-import yaml
+import sys
 
+from pathlib import Path
+path_root = Path(__file__).parents[1]
+sys.path.append(str(path_root)+'/libs')
+
+import libs.yaml as yaml
 print("Content-type: application/json\n")
 
-# Function to read rr_version from a file
+# # Function to read rr_version from a file
 def read_rr_version():
     try:
         with open('/mnt/loader1/RR_VERSION', 'r') as file:

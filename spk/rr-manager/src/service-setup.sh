@@ -6,10 +6,10 @@ service_postinst ()
     separator="===================================================="
 
     echo ${separator}
-    install_python_virtualenv
+    # install_python_virtualenv
 
-    echo ${separator}
-    install_python_wheels
+    # echo ${separator}
+    # install_python_wheels
     pip install --target ${SYNOPKG_PKGDEST}/app/libs/ -r .\requirements.txt
     /bin/sqlite3 ${SYNOPKG_PKGHOME}/api.db <${SYNOPKG_PKGDEST}/app/createsqlitedata.sql
 }

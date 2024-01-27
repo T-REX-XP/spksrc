@@ -1233,9 +1233,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             }, {
                 name: 'description',
                 type: 'string'
+            },{
+                name: 'installed',
+                type: 'boolean'
             }]
         });
-        debugger;
         var paging = new SYNO.ux.PagingToolbar({
             store: gridStore,
             displayInfo: true,
@@ -1255,7 +1257,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 columns: [{
                     header: "Name",
                     width: 60,
-                    dataIndex: "identifier"
+                    dataIndex: "name"
                 }, {
                     header: "Verison",
                     width: 20,
@@ -1264,6 +1266,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     header: "Description",
                     width: 400,
                     dataIndex: "description"
+                },{
+                    header: "Installed",
+                    width: 20,
+                    dataIndex: "installed"
                 }]
             }),
             viewConfig: {
@@ -1281,7 +1287,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             columnLines: true,
             frame: false,
             bbar: paging,
-            height: 200,
+            height: 400,
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,
@@ -1302,7 +1308,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
         myMask.show();
-
         console.log("----onOpen");
         //TODO: run mount loader disk task
         this.onRunTaskMountLoaderDiskClick();
@@ -1311,9 +1316,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             this.onPythonCGIClick();
             myMask.hide();
         }, 1000);
-
-        //TODO: fix install yaml package for python to read user-config.yml
-        //TODO: implement mount/unmount loader disk tasks to call them from the app
     }
 });
 

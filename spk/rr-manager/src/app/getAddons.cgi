@@ -12,6 +12,19 @@ import libs.yaml as yaml
 print("Content-type: application/json\n")
 
 
+#Function to read user configuration from a YAML file
+def read_user_config():
+    try:
+        with open('/mnt/loader1/user-config.yml', 'r') as file:
+            return yaml.safe_load(file)  # Load and parse the YAML file
+    except IOError as e:
+        return f"Error reading user-config.yml: {e}"
+    except e:
+        return "{}"
+
+
+userConfig = read_user_config()
+
 def read_manifests_in_subdirs(parent_directory):
     manifests = []
 
@@ -20,7 +33,10 @@ def read_manifests_in_subdirs(parent_directory):
         if os.path.exists(manifest_path): # Check if manifest.yml exists in the subdir
             with open(manifest_path, 'r') as file:
                 try:
-                    manifests.append(yaml.safe_load(file)) # Load the YAML file
+                    manifest = yaml.safe_load(file)
+                    manifest.installed = subdir in userConfig.addons
+                    manifests.append()
+                    
                 except yaml.YAMLError as exc:
                     print(f"Error reading {manifest_path}: {exc}")
 
@@ -34,6 +50,7 @@ ADDONS_PATH = '/mnt/loader3/addons/'
 response = {}
 
 if len(user) > 0:
+
     addons = read_manifests_in_subdirs(ADDONS_PATH)
     response['result'] = addons
     response['success'] = True

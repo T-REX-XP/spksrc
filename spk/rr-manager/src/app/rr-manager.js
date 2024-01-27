@@ -65,7 +65,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 layout: "fit",
                 items: [
                     // this.createSynoStore(),
-                    this.createSqlStore()
+                    this.createAddonsStore()
                 ]
             });
 
@@ -1197,9 +1197,9 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
 
     // Create the display of SQL Store
-    createSqlStore: function () {
+    createAddonsStore: function () {
         return new SYNO.ux.FieldSet({
-            title: "Modules",
+            title: "Addons",
             collapsible: true,
             autoHeight: true,
             items: [{

@@ -34,7 +34,10 @@ ADDONS_PATH = '/mnt/loader3/addons/'
 response = {}
 
 if len(user) > 0:
-    response = read_manifests_in_subdirs(ADDONS_PATH)
+    addons = read_manifests_in_subdirs(ADDONS_PATH)
+    response['result'] = addons
+    response['success'] = True
+    response['total'] = len(addons)
 else:
     response["status"] = "not authenticated"
 

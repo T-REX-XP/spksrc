@@ -41,17 +41,6 @@ if len(user) > 0:
     # Read and add rr_version to the response
     response["rr_version"] = read_rr_version()
     response["user_config"] = read_user_config()
-
-    # Listing directories in /mnt/
-    directories = []
-    try:
-        for entry in os.listdir('/mnt/'):
-            if os.path.isdir(os.path.join('/mnt/', entry)):
-                directories.append(entry)
-        response["directories"] = directories
-    except OSError as e:
-        response["error"] = str(e)
-
 else:
     response["status"] = "not authenticated"
 

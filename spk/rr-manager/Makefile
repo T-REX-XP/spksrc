@@ -1,6 +1,6 @@
 SPK_NAME = rr-manager
 SPK_VERS = 0.7
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -44,6 +44,7 @@ rr-manager_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/libs/
 	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
 	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
+	install -m 755 src/app/getAddons.cgi $(STAGING_DIR)/app/getAddons.cgi
 	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi
 	install -m 755 src/app/externalapi.cgi $(STAGING_DIR)/app/externalapi.cgi
 	install -m 755 src/app/storepythonsqlapi.cgi $(STAGING_DIR)/app/storepythonsqlapi.cgi

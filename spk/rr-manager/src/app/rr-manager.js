@@ -61,10 +61,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
             // Tab for Stores 1
             allTabs.push({
-                title: "Stores 1",
+                title: "Addons",
                 layout: "fit",
                 items: [
-                    this.createSynoStore(),
+                    // this.createSynoStore(),
                     this.createSqlStore()
                 ]
             });
@@ -1199,7 +1199,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create the display of SQL Store
     createSqlStore: function () {
         return new SYNO.ux.FieldSet({
-            title: "Python SQLite Store",
+            title: "Modules",
             collapsible: true,
             autoHeight: true,
             items: [{
@@ -1218,18 +1218,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     // Create JSON Store grid calling python SQL API  
     createSqlGrid: function () {
-
-        var localUrl = "/webman/3rdparty/rr-manager/storepythonsqlapi.cgi";
-
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
-            url: localUrl,
+            url: '/webman/3rdparty/rr-manager/getAddons.cgi',
             restful: true,
             root: 'result',
             idProperty: 'identifier',
             fields: [{
                 name: 'identifier',
-                type: 'int'
+                type: 'string'
             }, {
                 name: 'title',
                 type: 'string'

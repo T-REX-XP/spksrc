@@ -13,14 +13,14 @@ print("Content-type: application/json\n")
 
 
 def read_manifests_in_subdirs(parent_directory):
-    manifests = {}
+    manifests = []
 
     for subdir in next(os.walk(parent_directory))[1]: # Iterates through each subdirectory
         manifest_path = os.path.join(parent_directory, subdir, 'manifest.yml')
         if os.path.exists(manifest_path): # Check if manifest.yml exists in the subdir
             with open(manifest_path, 'r') as file:
                 try:
-                    manifests[subdir] = yaml.safe_load(file) # Load the YAML file
+                    manifests.append(yaml.safe_load(file)) # Load the YAML file
                 except yaml.YAMLError as exc:
                     print(f"Error reading {manifest_path}: {exc}")
 
@@ -34,11 +34,7 @@ ADDONS_PATH = '/mnt/loader3/addons/'
 response = {}
 
 if len(user) > 0:
-    # response["status"] = "authenticated"
-    # response["user"] = user
-    # response['addons'] = manifests_data = 
     response = read_manifests_in_subdirs(ADDONS_PATH)
-   
 else:
     response["status"] = "not authenticated"
 

@@ -125,7 +125,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         id: "lbRrVersion"
                     }]
                 },
-               
+
                 {
                     xtype: "syno_compositefield",
                     hideLabel: true,
@@ -1206,7 +1206,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 xtype: "syno_compositefield",
                 hideLabel: true,
                 items: [
-                    this.createSqlGrid()
+                    this.createAddonsGrid()
                 ]
             }
 
@@ -1217,25 +1217,25 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create JSON Store grid calling python SQL API  
-    createSqlGrid: function () {
+    createAddonsGrid: function () {
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
             url: '/webman/3rdparty/rr-manager/getAddons.cgi',
             restful: true,
             root: 'result',
-            idProperty: 'identifier',
+            idProperty: 'name',
             fields: [{
-                name: 'identifier',
+                name: 'name',
                 type: 'string'
             }, {
-                name: 'title',
+                name: 'version',
                 type: 'string'
             }, {
                 name: 'description',
                 type: 'string'
             }]
         });
-
+        debugger;
         var paging = new SYNO.ux.PagingToolbar({
             store: gridStore,
             displayInfo: true,
@@ -1253,16 +1253,16 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     height: 20
                 },
                 columns: [{
-                    header: "Id",
-                    width: 20,
+                    header: "Name",
+                    width: 60,
                     dataIndex: "identifier"
                 }, {
-                    header: "Title",
-                    width: 60,
-                    dataIndex: "title"
+                    header: "Verison",
+                    width: 20,
+                    dataIndex: "version"
                 }, {
                     header: "Description",
-                    width: 100,
+                    width: 400,
                     dataIndex: "description"
                 }]
             }),

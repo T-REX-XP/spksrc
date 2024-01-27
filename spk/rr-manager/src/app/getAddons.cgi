@@ -34,8 +34,8 @@ def read_manifests_in_subdirs(parent_directory):
             with open(manifest_path, 'r') as file:
                 try:
                     manifest = yaml.safe_load(file)
-                    manifest.installed = subdir in userConfig.addons
-                    manifests.append()
+                    manifest['installed'] = subdir in userConfig['addons']
+                    manifests.append(manifest)
                     
                 except yaml.YAMLError as exc:
                     print(f"Error reading {manifest_path}: {exc}")

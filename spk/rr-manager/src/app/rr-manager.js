@@ -1200,7 +1200,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     createAddonsStore: function () {
         return new SYNO.ux.FieldSet({
             title: "Addons",
-            collapsible: true,
+            collapsible: false,
             autoHeight: true,
             items: [{
                 xtype: "syno_compositefield",
@@ -1234,6 +1234,9 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 name: 'description',
                 type: 'string'
             },{
+                name: 'system',
+                type: 'boolean'
+            },{
                 name: 'installed',
                 type: 'boolean'
             }]
@@ -1260,16 +1263,26 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     dataIndex: "name"
                 }, {
                     header: "Verison",
-                    width: 20,
+                    width: 30,
                     dataIndex: "version"
                 }, {
                     header: "Description",
                     width: 400,
                     dataIndex: "description"
                 },{
+                    header: "System",
+                    width: 30,
+                    dataIndex: "system",
+                    renderer: function (value, metaData, record, row, col, store, gridView) {
+                        return value ? "✔️" :"";
+                    }
+                },{
                     header: "Installed",
-                    width: 20,
-                    dataIndex: "installed"
+                    width: 50,
+                    dataIndex: "installed",
+                    renderer: function (value, metaData, record, row, col, store, gridView) {
+                        return value ? "✔️" :"";
+                    }
                 }]
             }),
             viewConfig: {
@@ -1288,6 +1301,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             frame: false,
             bbar: paging,
             height: 400,
+            renderTo: Ext.getBody(),
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,

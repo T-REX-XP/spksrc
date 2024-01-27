@@ -1,6 +1,6 @@
 SPK_NAME = rr-manager
 SPK_VERS = 0.7
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -41,7 +41,7 @@ rr-manager_extra_install:
 	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse/requirements.txt
 
 	install -m 755 -d $(STAGING_DIR)/app/
-	install -m 755 -d $(STAGING_DIR)/libs/
+	install -m 755 -d $(STAGING_DIR)/app/libs/
 	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
 	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
 	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi

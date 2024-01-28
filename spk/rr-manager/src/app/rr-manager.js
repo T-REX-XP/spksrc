@@ -817,15 +817,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 var result = response.responseText;
                 var response = JSON.parse(result);
                 Ext.getCmp('lbRrVersion').setValue(response.rr_version);
-                console.log('--Response: ', result);
-                // window.alert('Python CGI called :\n' + result);
             },
             failure: function (response) {
                 window.alert('Request Failed.');
             }
-
         });
-
     },
     // Call Perl CGI on click
     onPerlCGIClick: function () {
@@ -849,7 +845,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             }
 
         });
-
     },
     // Stores
     //
@@ -883,21 +878,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     this.createGrid()
                 ]
             }
-
-
-
             ]
         });
     },
 
     // Create JSON Store grid calling python API  
     createGrid: function () {
-
-        var localUrl = "/webman/3rdparty/rr-manager/storepythonsynoapi.cgi";
-
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
-            url: localUrl,
+            url: "/webman/3rdparty/rr-manager/storepythonsynoapi.cgi",
             restful: true,
             root: 'result',
             idProperty: 'identifier',
@@ -972,10 +961,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 }
             }
         };
-
-
         return new SYNO.ux.GridPanel(c);
-
     },
 
 
@@ -992,16 +978,12 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     this.createAPIGrid()
                 ]
             }
-
-
-
             ]
         });
     },
 
     // Create API Store grid calling Syno API  
     createAPIGrid: function () {
-
         var APIName = "SYNO.Core.TaskScheduler";
 
         var gridStore = new SYNO.API.JsonStore({
@@ -1087,10 +1069,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 }
             }
         };
-
-
         return new SYNO.ux.GridPanel(c);
-
     },
 
 
@@ -1107,21 +1086,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     this.createRatesGrid()
                 ]
             }
-
-
-
             ]
         });
     },
 
     // Create JSON Store grid calling bash API  
     createRatesGrid: function () {
-
-        var localUrl = "/webman/3rdparty/rr-manager/storebashratesapi.cgi";
-
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
-            url: localUrl,
+            url: "/webman/3rdparty/rr-manager/storebashratesapi.cgi",
             restful: true,
             root: 'result',
             idProperty: 'key',
@@ -1194,8 +1167,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         return new SYNO.ux.GridPanel(c);
 
     },
-
-
     // Create the display of SQL Store
     createAddonsStore: function () {
         return new SYNO.ux.FieldSet({
@@ -1209,9 +1180,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     this.createAddonsGrid()
                 ]
             }
-
-
-
             ]
         });
     },
@@ -1233,10 +1201,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             }, {
                 name: 'description',
                 type: 'string'
-            },{
+            }, {
                 name: 'system',
                 type: 'boolean'
-            },{
+            }, {
                 name: 'installed',
                 type: 'boolean'
             }]
@@ -1269,19 +1237,19 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     header: "Description",
                     width: 400,
                     dataIndex: "description"
-                },{
+                }, {
                     header: "System",
                     width: 30,
                     dataIndex: "system",
                     renderer: function (value, metaData, record, row, col, store, gridView) {
-                        return value ? "✔️" :"";
+                        return value ? "✔️" : "";
                     }
-                },{
+                }, {
                     header: "Installed",
                     width: 50,
                     dataIndex: "installed",
                     renderer: function (value, metaData, record, row, col, store, gridView) {
-                        return value ? "✔️" :"";
+                        return value ? "✔️" : "";
                     }
                 }]
             }),
@@ -1322,12 +1290,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         //show progress indicator
         this.getEl().mask(_T("common", "loading"), "x-mask-loading");
-        console.log("----onOpen");
         this.onRunTaskMountLoaderDiskClick();
-        //TODO: run read rr config api
         setTimeout(x => {
             this.onPythonCGIClick();
-              //hide progress indicator
+            //hide progress indicator
             this.getEl().unmask();
         }, 1000);
     }

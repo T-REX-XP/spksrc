@@ -1320,15 +1320,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     onOpen: function (a) {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
-        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-        myMask.show();
+        //show progress indicator
+        this.getEl().mask(_T("common", "loading"), "x-mask-loading");
         console.log("----onOpen");
-        //TODO: run mount loader disk task
         this.onRunTaskMountLoaderDiskClick();
         //TODO: run read rr config api
         setTimeout(x => {
             this.onPythonCGIClick();
-            myMask.hide();
+              //hide progress indicator
+            this.getEl().unmask();
         }, 1000);
     }
 });

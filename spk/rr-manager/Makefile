@@ -1,6 +1,6 @@
 SPK_NAME = rr-manager
 SPK_VERS = 0.7
-SPK_REV = $(RUN_NUMBER) #15
+SPK_REV = 16
 SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app

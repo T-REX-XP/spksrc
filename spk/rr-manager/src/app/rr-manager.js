@@ -71,11 +71,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
             // Tab for Stores 2
             allTabs.push({
-                title: "Stores 2",
+                title: "Modules",
                 layout: "fit",
                 items: [
-                    this.createSynoAPIStore(),
-                    this.createRatesStore()
+                    this.createModulesStore()
                 ]
             });
 
@@ -777,30 +776,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
         });
     },
-    // Call C CGI on click
-    onCGIClick: function () {
-        Ext.Ajax.request({
-            url: '/webman/3rdparty/rr-manager/test.cgi',
-            method: 'GET',
-            timeout: 60000,
-            params: {
-                id: 1 // add params if needed
-            },
-            headers: {
-                'Content-Type': 'text/html'
-            },
-            success: function (response) {
-                var result = response.responseText;
-                window.alert('C CGI called :\n' + result);
-            },
-            failure: function (response) {
-                window.alert('Request Failed.');
-
-            }
-
-        });
-
-    },
     // Call Python CGI on click
     onPythonCGIClick: function () {
         Ext.Ajax.request({
@@ -821,29 +796,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             failure: function (response) {
                 window.alert('Request Failed.');
             }
-        });
-    },
-    // Call Perl CGI on click
-    onPerlCGIClick: function () {
-        Ext.Ajax.request({
-            url: '/webman/3rdparty/rr-manager/perl.cgi',
-            method: 'GET',
-            timeout: 60000,
-            params: {
-                id: 1 // add params if needed
-            },
-            headers: {
-                'Content-Type': 'text/html'
-            },
-            success: function (response) {
-                var result = response.responseText;
-                window.alert('Perl CGI called :\n' + result);
-            },
-            failure: function (response) {
-                window.alert('Request Failed.');
-
-            }
-
         });
     },
     // Stores
@@ -965,17 +917,17 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
 
-    // Create the display of API Store
-    createSynoAPIStore: function () {
+    // Create the display of modules
+    createModulesStore: function () {
         return new SYNO.ux.FieldSet({
-            title: "Syno API Store",
+            title: "Modules",
             collapsible: true,
             autoHeight: true,
             items: [{
                 xtype: "syno_compositefield",
                 hideLabel: true,
                 items: [
-                    this.createAPIGrid()
+                    this.createModulesGrid()
                 ]
             }
             ]
@@ -983,31 +935,30 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
 
     // Create API Store grid calling Syno API  
-    createAPIGrid: function () {
-        var APIName = "SYNO.Core.TaskScheduler";
-
+    createModulesGrid: function () {
+        // var APIName = "SYNO.Core.TaskScheduler";
         var gridStore = new SYNO.API.JsonStore({
-            api: APIName,
-            method: "list",
-            version: 2,
-            root: "tasks",
-            totalProperty: "total",
-            fields: ["id", "name", "action"],
-            remoteSort: true,
-            sortInfo: {
-                field: "name",
-                direction: "ASC"
-            },
-            defaultParamNames: {
-                sort: "sort_by",
-                dir: "sort_direction"
-            },
-            baseParams: {
-                start: 0,
-                limit: this.TotalRecords
-            },
-            autoDestroy: false,
-            autoLoad: false
+            autoDestroy: true,
+            url: '/webman/3rdparty/rr-manager/getModules.cgi',
+            restful: true,
+            root: 'result',
+            idProperty: 'name',
+            fields: [{
+                name: 'name',
+                type: 'string'
+            }, {
+                name: 'version',
+                type: 'string'
+            }, {
+                name: 'description',
+                type: 'string'
+            }, {
+                name: 'system',
+                type: 'boolean'
+            }, {
+                name: 'installed',
+                type: 'boolean'
+            }]
         });
 
         var paging = new SYNO.ux.PagingToolbar({

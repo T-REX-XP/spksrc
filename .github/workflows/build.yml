@@ -110,6 +110,7 @@ jobs:
         with:
           entrypoint: ./.github/actions/build.sh
         env:
+          RUN_NUMBER: ${{ github.run_number }}
           ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
           PUBLISH: ${{ github.event.inputs.publish }}

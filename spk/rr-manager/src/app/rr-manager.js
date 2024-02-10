@@ -136,7 +136,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         xtype: "syno_button",
                         btnStyle: "blue",
                         text: 'Read RR User Config',
-                        handler: this.onPythonCGIClick.bind(this)
+                        handler: this.onGetConfigClick.bind(this)
                     }]
                 }
             ]
@@ -777,9 +777,9 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         });
     },
     // Call Python CGI on click
-    onPythonCGIClick: function () {
+    onGetConfigClick: function () {
         Ext.Ajax.request({
-            url: '/webman/3rdparty/rr-manager/python.cgi',
+            url: '/webman/3rdparty/rr-manager/getConfig.cgi',
             method: 'GET',
             timeout: 60000,
             params: {
@@ -791,6 +791,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             success: function (response) {
                 var result = response.responseText;
                 var response = JSON.parse(result);
+                sessionStorage.setItem("rrConfig", result);
                 Ext.getCmp('lbRrVersion').setValue(response.rr_version);
             },
             failure: function (response) {
@@ -936,12 +937,14 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     // Create API Store grid calling Syno API  
     createModulesGrid: function () {
-        // var APIName = "SYNO.Core.TaskScheduler";
+        var rrConfigJson = sessionStorage.getItem("rrConfig");
+        var rrConfig = rrConfigJson ? JSON.parse(rrConfigJson) : {};
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
-            url: '/webman/3rdparty/rr-manager/getModules.cgi',
-            restful: true,
-            root: 'result',
+            data: rrConfig.modules,
+            // url: '/webman/3rdparty/rr-manager/getModules.cgi',
+           // restful: true,
+            //root: 'result',
             idProperty: 'name',
             fields: [{
                 name: 'name',
@@ -1243,7 +1246,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         this.getEl().mask(_T("common", "loading"), "x-mask-loading");
         this.onRunTaskMountLoaderDiskClick();
         setTimeout(x => {
-            this.onPythonCGIClick();
+            this.onGetConfigClick();
             //hide progress indicator
             this.getEl().unmask();
         }, 1000);

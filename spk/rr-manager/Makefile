@@ -43,7 +43,7 @@ rr-manager_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/
 	install -m 755 -d $(STAGING_DIR)/app/libs/
 	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
-	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
+	install -m 755 src/app/getConfig.cgi $(STAGING_DIR)/app/getConfig.cgi
 	install -m 755 src/app/getAddons.cgi $(STAGING_DIR)/app/getAddons.cgi
 	install -m 755 src/app/getModules.cgi $(STAGING_DIR)/app/getModules.cgi
 	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi

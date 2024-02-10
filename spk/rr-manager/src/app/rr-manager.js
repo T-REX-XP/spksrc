@@ -938,13 +938,32 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create API Store grid calling Syno API  
     createModulesGrid: function () {
         var rrConfigJson = sessionStorage.getItem("rrConfig");
-        var rrConfig = rrConfigJson ? JSON.parse(rrConfigJson) : {};
+        var rrConfig = rrConfigJson ? JSON.parse(rrConfigJson) : {
+            user_config: {
+                modules: {
+
+                }
+            }
+        };
+        var modules = [];
+        Object.keys(rrConfig.user_config.modules).forEach(moduleName => {
+            modules.push({
+                name: moduleName,
+                version: "1.0",
+                description: "",
+                system: false,
+                installed: false
+            });
+        });
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
-            data: rrConfig.modules,
-            // url: '/webman/3rdparty/rr-manager/getModules.cgi',
-           // restful: true,
-            //root: 'result',
+            data: {
+                result: modules
+            },
+            load: function () {
+                return Promise.resolve(this.data);
+            },
+            root: 'result',
             idProperty: 'name',
             fields: [{
                 name: 'name',
@@ -981,17 +1000,17 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     height: 20
                 },
                 columns: [{
-                    header: "Id",
-                    width: 20,
-                    dataIndex: "id"
-                }, {
                     header: "Name",
-                    width: 60,
+                    width: 20,
                     dataIndex: "name"
                 }, {
-                    header: "Action",
+                    header: "Version",
+                    width: 60,
+                    dataIndex: "version"
+                }, {
+                    header: "Description",
                     width: 100,
-                    dataIndex: "action"
+                    dataIndex: "description"
                 }]
             }),
             viewConfig: {
@@ -1009,7 +1028,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             columnLines: true,
             frame: false,
             bbar: paging,
-            height: 200,
+            height: 400,
             cls: "resource-monitor-performance",
             listeners: {
                 scope: this,

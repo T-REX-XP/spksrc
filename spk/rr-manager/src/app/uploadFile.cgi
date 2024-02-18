@@ -18,7 +18,7 @@ MAX_FILE_SIZE = 1073741824  # in bytes
 
 # Function to check MIME type
 def allowed_file_mime(mimetype):
-    return mimetype == 'application/zip'
+    return mimetype == 'application/x-zip-compressed'
 response = {}
 
 # Authenticate the user

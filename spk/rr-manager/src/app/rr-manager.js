@@ -32,7 +32,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 ]
             });
 
-          
+
             // Tab for Stores 1
             allTabs.push({
                 title: "Addons",
@@ -52,7 +52,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 ]
             });
 
-             allTabs.push({
+            allTabs.push({
                 title: "Update",
                 layout: "fit",
                 items: [
@@ -85,14 +85,11 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
         this.callParent([config]);
     },
-    submitFile:function (e) {
-        
-    },
     saveChanges: function (e) {
         debugger;
         //Rewrite rr config with new addons
         var newAddons = {};
-        that["rrInstalledAddons"].forEach(addonName => {
+        that["rrInstalledAddons"]?.forEach(addonName => {
             newAddons[addonName] = ""
         });
 
@@ -101,23 +98,38 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         //TODO: rewrite the config on the fs
         console.log("newRrConfig:", that["rrConfigNew"]);
     },
-    createUploadPannel:function (){
+    createUploadPannel: function () {
         var myFormPanel = new Ext.form.FormPanel({
             renderTo: document.body,
             title: 'Upload Form',
             url: '/webman/3rdparty/rr-manager/uploadFile.cgi',
-            height: 100,
+            height: '100%',
+            fileUpload: true,
             width: 400,
+            border: !1,
             bodyPadding: 10,
             items: [{
                 xtype: 'syno_filebutton',
                 text: 'Select File',
-                name: 'fileUpload',
-                // Listener for file selection
-                listeners: {
-                    fileselected: function(btn, value) {
-                        // Handle the file selection event
-                        console.log('Selected file: ' + value);
+                name: 'filename',
+                allowBlank: false,
+            }],
+            buttons: [{
+                text: 'Upload',
+                xtype: "syno_button",
+                btnStyle: "green",
+                handler: function () {
+                    var form = myFormPanel.getForm();
+                    if (form.isValid()) {
+                        form.submit({
+                            waitMsg: 'Uploading your file...',
+                            success: function (fp, o) {
+                                Ext.Msg.alert('Success', 'Your file has been uploaded.');
+                            },
+                            failure: function (fp, o) {
+                                Ext.Msg.alert('Error', 'There was an issue uploading your file.');
+                            }
+                        });
                     }
                 }
             }]
@@ -1308,7 +1320,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                             text: 'Save Changes',
                             handler: this.saveChanges.bind(this)
                         },
-                        
+
                     ]
                 }
             ],
@@ -1403,7 +1415,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
     onOpen: function (a) {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
-        //show progress indicator
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
     }

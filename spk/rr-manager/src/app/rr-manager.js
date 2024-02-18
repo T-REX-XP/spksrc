@@ -23,42 +23,16 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
             // Tab for CGI or API calls
             allTabs.push({
-                title: "Server Calls",
+                title: "General",
                 items: [
+                    //this.createSystemInfoPannel(),
                     this.createDisplayCGI(),
                     this.createDisplayAPI(),
                     // this.createDisplayExternalAPI()
                 ]
             });
 
-            // Tab for Form components
-            allTabs.push({
-                title: "Form Components",
-                layout: "fit",
-                items: [
-                    this.createStandardGUI(),
-                    this.createAdvancedGUI()
-                ]
-            });
-
-            // Tab for Menu & Toolbar components
-            allTabs.push({
-                title: "Menu & Toolbar Components",
-                layout: "fit",
-                items: [
-                    this.createMenuGUI()
-                ]
-            });
-
-            // Tab for User interaction
-            allTabs.push({
-                title: "User interaction",
-                layout: "fit",
-                items: [
-                    this.createInteraction()
-                ]
-            });
-
+          
             // Tab for Stores 1
             allTabs.push({
                 title: "Addons",
@@ -74,7 +48,15 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 title: "Modules",
                 layout: "fit",
                 items: [
-                    this.createModulesStore()
+                    this.createModulesStore(),
+                ]
+            });
+
+             allTabs.push({
+                title: "Update",
+                layout: "fit",
+                items: [
+                    this.createUploadPannel()
                 ]
             });
 
@@ -102,6 +84,61 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         }, config);
 
         this.callParent([config]);
+    },
+    submitFile:function (e) {
+        
+    },
+    saveChanges: function (e) {
+        debugger;
+        //Rewrite rr config with new addons
+        var newAddons = {};
+        that["rrInstalledAddons"].forEach(addonName => {
+            newAddons[addonName] = ""
+        });
+
+        that["rrConfigNew"] = that["rrConfig"];
+        that["rrConfigNew"]["addons"] = newAddons;
+        //TODO: rewrite the config on the fs
+        console.log("newRrConfig:", that["rrConfigNew"]);
+    },
+    createUploadPannel:function (){
+        var myFormPanel = new Ext.form.FormPanel({
+            renderTo: document.body,
+            title: 'Upload Form',
+            url: '/webman/3rdparty/rr-manager/uploadFile.cgi',
+            height: 100,
+            width: 400,
+            bodyPadding: 10,
+            items: [{
+                xtype: 'syno_filebutton',
+                text: 'Select File',
+                name: 'fileUpload',
+                // Listener for file selection
+                listeners: {
+                    fileselected: function(btn, value) {
+                        // Handle the file selection event
+                        console.log('Selected file: ' + value);
+                    }
+                }
+            }]
+        });
+        return myFormPanel;
+    },
+    createSystemInfoPannel: function () {
+
+        return new SYNO.ux.FieldSet({
+            collapsible: true,
+            renderTo: document.body,
+            title: 'Device Information',
+            id: 'deviceInfoPanel',
+            name: 'deviceInfoPanel',
+            // width: 600,
+            frame: true,
+            labelWidth: 130,
+            bodyStyle: 'padding:10px;',
+            autoScroll: true,
+            items: []
+        });
     },
     // Create the display of CGI calls
     createDisplayCGI: function () {
@@ -778,6 +815,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     },
     // Call Python CGI on click
     onGetConfigClick: function () {
+        that = this;
         Ext.Ajax.request({
             url: '/webman/3rdparty/rr-manager/getConfig.cgi',
             method: 'GET',
@@ -789,15 +827,48 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 'Content-Type': 'text/html'
             },
             success: function (response) {
-                var result = response.responseText;
-                var response = JSON.parse(result);
-                sessionStorage.setItem("rrConfig", result);
-                Ext.getCmp('lbRrVersion').setValue(response.rr_version);
+                var configName = "rrConfig";
+                that[configName] = JSON.parse(response.responseText);
+                sessionStorage.setItem(configName, response.responseText);
+                that.populateSystemInfoPanel(that[configName]);
             },
             failure: function (response) {
                 window.alert('Request Failed.');
             }
         });
+    },
+    populateSystemInfoPanel: function (config) {
+        Ext.getCmp('lbRrVersion').setValue(config.rr_version);
+        var userConfig = config.user_config;
+        if (!userConfig) return;
+
+
+        var panel = Ext.getCmp('deviceInfoPanel');
+        // Function to handle adding both simple and complex (nested objects) properties
+        var addItems = function (object, prefix) {
+            var ignoreKeys = ["addons", "modules"];
+            for (var key in object) {
+                if (ignoreKeys.indexOf(key) >= 0) return;
+
+                var value = object[key];
+                var fieldLabel = prefix ? prefix + "." + key : key; // Handle nested keys
+
+                if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                    // If the value is a nested object, recursively add its properties
+                    addItems(value, fieldLabel);
+                } else {
+                    // Convert non-string values to strings for display
+                    if (typeof value !== 'string') {
+                        value = JSON.stringify(value);
+                    }
+
+                    panel.add({ xtype: 'displayfield', fieldLabel: fieldLabel, value: value || 'N/A', anchor: '100%' });
+                }
+            }
+        };
+
+        addItems(userConfig, '');
+        panel.doLayout();
     },
     // Stores
     //
@@ -1143,7 +1214,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     // Create the display of SQL Store
     createAddonsStore: function () {
         return new SYNO.ux.FieldSet({
-            title: "Addons",
+            // title: "Addons",
             collapsible: false,
             autoHeight: true,
             items: [{
@@ -1156,9 +1227,43 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             ]
         });
     },
-
     // Create JSON Store grid calling python SQL API  
     createAddonsGrid: function () {
+        var that = this;
+        function getLng(lng) {
+            const localeMapping = {
+                'dan': 'da_DK', // Danish in Denmark
+                'ger': 'de_DE', // German in Germany
+                'enu': 'en_US', // English (United States)
+                'spn': 'es_ES', // Spanish (Spain)
+                'fre': 'fr_FR', // French in France
+                'ita': 'it_IT', // Italian in Italy
+                'hun': 'hu_HU', // Hungarian in Hungary
+                'nld': 'nl_NL', // Dutch in The Netherlands
+                'nor': 'no_NO', // Norwegian in Norway
+                'plk': 'pl_PL', // Polish in Poland
+                'ptg': 'pt_PT', // European Portuguese
+                'ptb': 'pt_BR', // Brazilian Portuguese
+                'sve': 'sv_SE', // Swedish in Sweden
+                'trk': 'tr_TR', // Turkish in Turkey
+                'csy': 'cs_CZ', // Czech in Czech Republic
+                'gre': 'el_GR', // Greek in Greece
+                'rus': 'uk-UA', // Russian in Russia
+                'heb': 'he_IL', // Hebrew in Israel
+                'ara': 'ar_SA', // Arabic in Saudi Arabia
+                'tha': 'th_TH', // Thai in Thailand
+                'jpn': 'ja_JP', // Japanese in Japan
+                'chs': 'zh_CN', // Simplified Chinese in China
+                'cht': 'zh_TW', // Traditional Chinese in Taiwan
+                'krn': 'ko_KR', // Korean in Korea
+                'vi': 'vi-VN', // Vietnam in Vietnam 
+            };
+            return Object.keys(localeMapping).indexOf(lng) > -1
+                ? localeMapping[lng] : localeMapping["enu"];
+        }
+
+        var currentLngCode = getLng(SYNO.SDS.UserSettings.data.Personal.lang)
+
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
             url: '/webman/3rdparty/rr-manager/getAddons.cgi',
@@ -1173,7 +1278,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 type: 'string'
             }, {
                 name: 'description',
-                type: 'string'
+                type: 'object'
             }, {
                 name: 'system',
                 type: 'boolean'
@@ -1191,6 +1296,22 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
         var c = {
             store: gridStore,
+            id: "gridAddons",
+            tbar: [
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [
+                        {
+                            xtype: "syno_button",
+                            btnStyle: "green",
+                            text: 'Save Changes',
+                            handler: this.saveChanges.bind(this)
+                        },
+                        
+                    ]
+                }
+            ],
             colModel: new Ext.grid.ColumnModel({
                 defaults: {
                     sortable: true,
@@ -1209,7 +1330,10 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 }, {
                     header: "Description",
                     width: 400,
-                    dataIndex: "description"
+                    dataIndex: "description",
+                    renderer: function (value, metaData, record, row, col, store, gridView) {
+                        return value[currentLngCode] ?? value["en_US"];
+                    }
                 }, {
                     header: "System",
                     width: 30,
@@ -1222,7 +1346,9 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     width: 50,
                     dataIndex: "installed",
                     renderer: function (value, metaData, record, row, col, store, gridView) {
-                        return value ? "✔️" : "";
+                        return '<input type="checkbox" class="grid-checkbox-installed" ' +
+                            (value ? 'checked="checked"' : '') +
+                            ' data-row="' + row + '" data-record-id="' + record.data.name + '"/>';
                     }
                 }]
             }),
@@ -1253,6 +1379,22 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                             limit: 5
                         }
                     });
+                },
+                afterrender: function (grid) {
+                    // Directly use the grid's 'el' property to attach the event listener
+                    grid.el.on('change', function (e, t) {
+                        if (t.className && t.className.indexOf('grid-checkbox-installed') > -1) {
+                            var recordId = t.getAttribute('data-record-id');
+                            var record = gridStore.getById(recordId);
+                            if (record) {
+                                record.set('installed', t.checked);
+                            }
+                        }
+                        //collect installed modules
+                        that["rrInstalledAddons"] = grid.getStore().getRange().filter(x => { return x.data.installed == true }).map((x) => {
+                            return x.id
+                        });
+                    }, this, { delegate: 'input.grid-checkbox-installed' });
                 }
             }
         };
@@ -1262,13 +1404,8 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
     onOpen: function (a) {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         //show progress indicator
-        this.getEl().mask(_T("common", "loading"), "x-mask-loading");
         this.onRunTaskMountLoaderDiskClick();
-        setTimeout(x => {
-            this.onGetConfigClick();
-            //hide progress indicator
-            this.getEl().unmask();
-        }, 1000);
+        this.onGetConfigClick();
     }
 });
 

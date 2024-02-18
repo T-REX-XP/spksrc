@@ -14,8 +14,9 @@ print("Content-type: application/json\n")
 
 #Function to read user configuration from a YAML file
 def read_user_config():
+    userConfigPath = "/mnt/p1/user-config.yml"
     try:
-        with open('/mnt/loader1/user-config.yml', 'r') as file:
+        with open(userConfigPath, 'r') as file:
             return yaml.safe_load(file)  # Load and parse the YAML file
     except IOError as e:
         return f"Error reading user-config.yml: {e}"
@@ -46,7 +47,7 @@ def read_manifests_in_subdirs(parent_directory):
 # Authenticate the user
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()
-ADDONS_PATH = '/mnt/loader3/addons/'
+ADDONS_PATH = '/mnt/p3/addons/'
 response = {}
 
 if len(user) > 0:

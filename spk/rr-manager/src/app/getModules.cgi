@@ -38,7 +38,7 @@ def read_modules(parent_directory):
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()
 
-ADDONS_PATH = '/mnt/loader3/modules/'
+ADDONS_PATH = '/mnt/p3/modules/'
 response = {}
 
 if len(user) > 0:

@@ -20,10 +20,10 @@ user = f.read().strip()
 response = {}
 
 if len(user) > 0:
-    with zipfile.ZipFile("/tmp/update.zip", mode="r") as arch:
-       # response['message'] = arch.printdir()
-        response['updateVersion'] =arch.read("RR_VERSION")
-        response['success'] = True
+    with zipfile.ZipFile("/tmp/update.zip", mode="r") as zif:
+        for lines in zif.read("RR_VERSION").split(b"\r\n"):
+            response['updateVersion'] = lines.strip().decode('utf-8')
+            response['success'] = True
 else:
     response["status"] = "not authenticated"
 

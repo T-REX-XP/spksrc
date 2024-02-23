@@ -17,9 +17,12 @@ print("Content-type: application/json\n")
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()
 
+response = {}
+
 if len(user) > 0:
-    with zipfile.ZipFile("/tmn/update.zip", mode="r") as arch:
-        response['message'] = arch.printdir()
+    with zipfile.ZipFile("/tmp/update.zip", mode="r") as arch:
+       # response['message'] = arch.printdir()
+        response['updateVersion'] =arch.read("RR_VERSION")
         response['success'] = True
 else:
     response["status"] = "not authenticated"

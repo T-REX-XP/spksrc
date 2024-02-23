@@ -109,12 +109,18 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 let formData = new FormData();
                 formData.append('file', chunk);
                 formData.append('filename', "update.zip");
-                formData.append('path', "/tmp/");
+                formData.append('create_parents', true);
+                formData.append('path', "/docker");
+                formData.append('overwrite', true);
+
                 // Include other parameters as needed
                 try {
                     const response = await fetch(url, { // Append your session ID (_sid) as required
                         method: 'POST',
                         body: formData,
+                        headers:{
+                            "Content-Type": "multipart/form-data; boundary=" + "e.boundary"
+                        }
                     });
                     if (!response.ok) throw new Error('Upload failed');
                     // Handle response here
@@ -261,8 +267,8 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                         }, {
                             xtype: "syno_button",
                             btnStyle: "blue",
-                            text: 'Read RR User Config',
-                            handler: this.onGetConfigClick.bind(this)
+                            text: 'Read RR Update File',
+                            handler: this.onReadUpdateFileClick.bind(this)
                         }]
                     }
                 ]
@@ -843,6 +849,29 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
 
         });
     },
+    onReadUpdateFileClick: function () {
+        that = this;
+        Ext.Ajax.request({
+            url: '/webman/3rdparty/rr-manager/readUpdateFile.cgi',
+            method: 'GET',
+            timeout: 60000,
+            params: {
+                id: 1 // add params if needed
+            },
+            headers: {
+                'Content-Type': 'text/html'
+            },
+            success: function (response) {
+                var configName = "rrConfig";
+                that[configName] = JSON.parse(response.responseText);
+                sessionStorage.setItem(configName, response.responseText);
+                that.populateSystemInfoPanel(that[configName]);
+            },
+            failure: function (response) {
+                window.alert('Request Failed.');
+            }
+        });
+    },
     // Call Python CGI on click
     onGetConfigClick: function () {
         that = this;
@@ -898,7 +927,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         };
 
         // addItems(userConfig, '');
-        panel.doLayout();
+       // panel.doLayout();
     },
     // Stores
     //

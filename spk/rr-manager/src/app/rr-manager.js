@@ -43,14 +43,14 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 ]
             });
 
-            // Tab for Stores 2
-            allTabs.push({
-                title: "Modules",
-                layout: "fit",
-                items: [
-                    this.createModulesStore(),
-                ]
-            });
+            // // Tab for Stores 2
+            // allTabs.push({
+            //     title: "Modules",
+            //     layout: "fit",
+            //     items: [
+            //         this.createModulesStore(),
+            //     ]
+            // });
 
             allTabs.push({
                 title: "Update",
@@ -86,7 +86,6 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         this.callParent([config]);
     },
     saveChanges: function (e) {
-        debugger;
         //Rewrite rr config with new addons
         var newAddons = {};
         that["rrInstalledAddons"]?.forEach(addonName => {
@@ -99,10 +98,39 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
         console.log("newRrConfig:", that["rrConfigNew"]);
     },
     createUploadPannel: function () {
+        var that = this;
+        async function handleFileUpload(file, url, parent) {
+            const CHUNK_SIZE = 8 * 1024 * 1024; // 1MB
+            let start = 0;
+            while (start < file.size) {
+                let end = Math.min(file.size, start + CHUNK_SIZE);
+                let chunk = file.slice(start, end);
+
+                let formData = new FormData();
+                formData.append('file', chunk);
+                formData.append('filename', "update.zip");
+                formData.append('path', "/tmp/");
+                // Include other parameters as needed
+                try {
+                    const response = await fetch(url, { // Append your session ID (_sid) as required
+                        method: 'POST',
+                        body: formData,
+                    });
+                    if (!response.ok) throw new Error('Upload failed');
+                    // Handle response here
+                    console.log(`Uploaded chunk from ${start} to ${end}`);
+                } catch (error) {
+                    console.error('Error uploading chunk', error);
+                    parent.getEl().unmask();
+                }
+                start += CHUNK_SIZE;
+            }
+            parent.getEl().unmask();
+        }
         var myFormPanel = new Ext.form.FormPanel({
             renderTo: document.body,
-            title: 'Upload Form',
-            url: '/webman/3rdparty/rr-manager/uploadFile.cgi',
+            title: 'Please upload the update file:',
+            url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
             height: '100%',
             fileUpload: true,
             width: 400,
@@ -115,21 +143,16 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 allowBlank: false,
             }],
             buttons: [{
-                text: 'Upload',
+                text: _T("ldap", "upload"),
                 xtype: "syno_button",
                 btnStyle: "green",
                 handler: function () {
                     var form = myFormPanel.getForm();
+                    var fileObject = form.el.dom[1].files[0];
                     if (form.isValid()) {
-                        form.submit({
-                            waitMsg: 'Uploading your file...',
-                            success: function (fp, o) {
-                                Ext.Msg.alert('Success', 'Your file has been uploaded.');
-                            },
-                            failure: function (fp, o) {
-                                Ext.Msg.alert('Error', 'There was an issue uploading your file.');
-                            }
-                        });
+                        //show progress indicator
+                        form.getEl().mask(_T("common", "loading"), "x-mask-loading");
+                        handleFileUpload(fileObject, form.url, form);
                     }
                 }
             }]
@@ -174,20 +197,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                     }]
                 },
 
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
-                        value: 'Get RR config:',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "blue",
-                        text: 'Read RR User Config',
-                        handler: this.onGetConfigClick.bind(this)
-                    }]
-                }
+
             ]
         });
     },
@@ -239,6 +249,20 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                             btnStyle: "green",
                             text: 'Call API ',
                             handler: this.onAPIStorageClick.bind(this)
+                        }]
+                    },
+                    {
+                        xtype: "syno_compositefield",
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Get RR config:',
+                            width: 140
+                        }, {
+                            xtype: "syno_button",
+                            btnStyle: "blue",
+                            text: 'Read RR User Config',
+                            handler: this.onGetConfigClick.bind(this)
                         }]
                     }
                 ]
@@ -648,18 +672,12 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
                 }
             }],
             items: [{
-
                 xtype: 'syno_displayfield',
                 value: 'Do you want to continue the demo ?',
-
             }
-
             ],
-
         });
         window.open();
-
-
     },
 
     // Create the content for the ComboBox
@@ -879,7 +897,7 @@ Ext.define("SYNOCOMMUNITY.RRManager.AppWindow", {
             }
         };
 
-        addItems(userConfig, '');
+        // addItems(userConfig, '');
         panel.doLayout();
     },
     // Stores

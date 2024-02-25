@@ -81,7 +81,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             newAddons[addonName] = ''
         });
 
-        that['rrConfigNew'] = that['rrConfig'];
+        that['rrConfigNew'] = that['rrConfig']['user_config'];
         that['rrConfigNew']['addons'] = newAddons;
 
         this.handleFileUpload(that['rrConfigNew']);

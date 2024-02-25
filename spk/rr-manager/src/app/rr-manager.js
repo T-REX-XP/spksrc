@@ -477,6 +477,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     width: 50,
                     dataIndex: 'installed',
                     renderer: function (value, metaData, record, row, col, store, gridView) {
+                        if (!record.data.system)
                         return '<input type="checkbox" class="grid-checkbox-installed" ' +
                             (value ? 'checked="checked"' : '') +
                             ' data-row="' + row + '" data-record-id="' + record.data.name + '"/>';

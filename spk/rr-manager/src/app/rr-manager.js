@@ -24,6 +24,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             // Tab for CGI or API calls
             allTabs.push({
                 title: 'General',
+                id: "tabGeneral",
                 items: [
                     //this.createSystemInfoPannel(),
                     this.createGeneralSection(),
@@ -35,19 +36,22 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             allTabs.push({
                 title: 'Addons',
                 layout: 'fit',
+                id: "tabAddons",
                 items: [
                     // this.createSynoStore(),
                     this.createAddonsStore()
                 ]
             });
 
-            // allTabs.push({
-            //     title: 'Update',
-            //     layout: 'fit',
-            //     items: [
-            //         this.createUploadPannel()
-            //     ]
-            // });
+            allTabs.push({
+                title: 'Update',
+                layout: 'fit',
+                id: "tabUpdate",
+                name: "tabUpdate",
+                items: [
+                    this.createUploadPannel()
+                ]
+            });
 
             return allTabs;
         }).call(this);
@@ -97,11 +101,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             headers: {
                 'Content-Type': 'application/json' // Set the appropriate header
             },
-            success: function(response) {
+            success: function (response) {
                 // Handle successful response
                 console.log('Success:', response.responseText);
             },
-            failure: function(response) {
+            failure: function (response) {
                 // Handle request failure
                 console.error('Error:', response.status, response.statusText);
             }
@@ -132,10 +136,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     var form = myFormPanel.getForm();
                     var fileObject = form.el.dom[1].files[0];
                     if (!form.isValid()) return;
+                    that.tabUpload.mask(_T("common", "loading"), "x-mask-loading");
+                    that.onUploadFile(fileObject);
                     //TODO: implement sending file to /tmp/ with name update.zip
                 }
             }]
         });
+        this.tabUpload = myFormPanel.getForm().getEl();
         return myFormPanel;
     },
     createSystemInfoPannel: function () {
@@ -532,6 +539,206 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
+    },
+    sendArray: function (e, t, i, o, r) {
+        var that = this;
+        if ("CANCEL" !== t.status) {
+            var n, s = {}, l = {};
+            if (!0 === t.chunkmode)
+                if (l = {
+                    "Content-Type": "multipart/form-data; boundary=" + e.boundary
+                },
+                    s = {
+                        "X-TYPE-NAME": "SLICEUPLOAD",
+                        "X-FILE-SIZE": t.size,
+                        "X-FILE-CHUNK-END": 1 > o.total || o.index === o.total - 1 ? "true" : "false"
+                    },
+                    r && Ext.apply(s, {
+                        "X-TMP-FILE": r
+                    }),
+                    window.XMLHttpRequest.prototype.sendAsBinary)
+                    n = e.formdata + ("" !== i ? i : "") + "\r\n--" + e.boundary + "--\r\n";
+                else if (window.Blob) {
+                    var a, d = 0, p = 0, h = 0, c = "\r\n--" + e.boundary + "--\r\n", f = e.formdata.length + c.length;
+                    for (h = Ext.isString(i) ? i.length : new Uint8Array(i).byteLength,
+                        a = new Uint8Array(f += h),
+                        d = 0; d < e.formdata.length; d++)
+                        a[d] = e.formdata.charCodeAt(d);
+                    if (Ext.isString(i))
+                        for (p = 0; p < i.length; p++)
+                            a[d + p] = i.charCodeAt(p);
+                    else
+                        a.set(new Uint8Array(i), d);
+                    for (d += h,
+                        p = 0; p < c.length; p++)
+                        a[d + p] = c.charCodeAt(p);
+                    n = a
+                } else {
+                    var u;
+                    window.MSBlobBuilder ? u = new MSBlobBuilder : window.BlobBuilder && (u = new BlobBuilder),
+                        u.append(e.formdata),
+                        "" !== i && u.append(i),
+                        u.append("\r\n--" + e.boundary + "--\r\n"),
+                        n = u.getBlob(),
+                        u = null
+                }
+            else
+                e.append("size", t.size),
+                    t.name ? e.append(this.opts.filefiledname, t, t.name) : e.append(this.opts.filefiledname, t.file),
+                    n = e;
+            this.conn = new Ext.data.Connection({
+                method: "POST",
+                url: "webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2&SynoToken=" + localStorage["SynoToken"],
+                defaultHeaders: l,
+                timeout: null
+            });
+            var m = this.conn.request({
+                headers: s,
+                html5upload: !0,
+                chunkmode: t.chunkmode,
+                uploadData: n,
+                success: (x) => {
+                    that?.tabUpload?.unmask();
+                    window.alert("File has been successfully uploaded to the downloads folder.");
+                },
+                failure: (x) => {
+                    that?.tabUpload?.unmask();
+                    window.alert("Error file uploading.");
+                    console.log(x);
+                },
+                progress: (x) => {},
+            });
+        }
+    },
+    MAX_POST_FILESIZE: Ext.isWebKit ? -1 : window.console && window.console.firebug ? 20971521 : 4294963200,
+    onUploadFile: function (e) {
+        var t, i = !1;
+        if (-1 !== this.MAX_POST_FILESIZE && e.size > this.MAX_POST_FILESIZE && i)
+            this.onError({
+                errno: {
+                    section: "error",
+                    key: "upload_too_large"
+                }
+            }, e);
+        else if (t = this.prepareStartFormdata(e), e.chunkmode) {
+            var o = this.opts.chunksize,
+                r = Math.ceil(e.size / o);
+            this.onUploadPartailFile(t, e, {
+                start: 0,
+                index: 0,
+                total: r
+            })
+        } else
+            this.sendArray(t, e)
+    },
+    opts: {
+        chunkmode: false,
+        filefiledname: "file",
+        file: function (t) {
+            var FileObj = function (e, t, i, o) {
+                var r = SYNO.SDS.copy(t || {})
+                    , n = SYNO.webfm.utils.getLastModifiedTime(e);
+                return n && (r = Ext.apply(r, {
+                    mtime: n
+                })),
+                {
+                    id: i,
+                    file: e,
+                    dtItem: o,
+                    name: e.name || e.fileName,
+                    size: e.size || e.fileSize,
+                    progress: 0,
+                    status: "NOT_STARTED",
+                    params: r,
+                    chunkmode: !1
+                }
+            }
+
+            mtime = SYNO.webfm.utils.getLastModifiedTime(t);
+            var i = new FileObj(t, { mtime: mtime });
+            return i;
+        },
+        params: {
+            path: "/docker",
+            //TODO: remove
+            filename: "text.yml",
+            size: 5181,
+            overwrite: true
+        }
+    },
+    prepareStartFormdata: function (e) {
+        e.chunkmode = (-1 !== this.MAX_POST_FILESIZE && e.size > this.MAX_POST_FILESIZE);
+        if (this.opts.chunkmode) {
+            var boundary = "----html5upload-" + (new Date).getTime().toString() + Math.floor(65535 * Math.random()).toString();
+            var contentPrefix = "";
+
+            if (this.opts.params)
+                for (var paramName in this.opts.params) {
+                    if (this.opts.params.hasOwnProperty(paramName)) {
+                        contentPrefix += "--" + boundary + '\r\n';
+                        contentPrefix += 'Content-Disposition: form-data; name="' + paramName + '"\r\n\r\n';
+                        contentPrefix += unescape(encodeURIComponent(this.opts.params[paramName])) + "\r\n";
+                    }
+                }
+
+            if (e.params)
+                for (var paramName in e.params) {
+                    if (e.params.hasOwnProperty(paramName)) {
+                        contentPrefix += "--" + boundary + '\r\n';
+                        contentPrefix += 'Content-Disposition: form-data; name="' + paramName + '"\r\n\r\n';
+                        contentPrefix += unescape(encodeURIComponent(e.params[paramName])) + "\r\n";
+                    }
+                }
+
+            var filename = unescape(encodeURIComponent(e.name));
+            contentPrefix += "--" + boundary + '\r\n';
+            contentPrefix += 'Content-Disposition: form-data; name="' + (this.opts.filefiledname || "file") + '"; filename="' + filename + '"\r\n';
+            contentPrefix += 'Content-Type: application/octet-stream\r\n\r\n';
+
+            return {
+                formdata: contentPrefix,
+                boundary: boundary
+            };
+        } else {
+            var formData = new FormData();
+
+            if (this.opts.params)
+                for (var paramName in this.opts.params) {
+                    if (this.opts.params.hasOwnProperty(paramName)) {
+                        formData.append(paramName, this.opts.params[paramName]);
+                    }
+                }
+
+            if (e.params)
+                for (var paramName in e.params) {
+                    if (e.params.hasOwnProperty(paramName)) {
+                        formData.append(paramName, e.params[paramName]);
+                    }
+                }
+
+            return formData;
+        }
+    },
+    onUploadPartailFile: function (e, t, i, o) {
+        i.start = i.index * this.opts.chunksize;
+        var chunkSize = Math.min(this.opts.chunksize, t.size - i.start);
+
+        if ("PROCESSING" === t.status) {
+            var fileSlice;
+
+            if (window.File && File.prototype.slice) {
+                fileSlice = t.file.slice(i.start, i.start + chunkSize);
+            } else if (window.File && File.prototype.webkitSlice) {
+                fileSlice = t.file.webkitSlice(i.start, i.start + chunkSize);
+            } else if (window.File && File.prototype.mozSlice) {
+                fileSlice = t.file.mozSlice(i.start, i.start + chunkSize);
+            } else {
+                this.onError({}, t);
+                return;
+            }
+
+            this.sendArray(e, t, fileSlice, i, o);
+        }
     }
 });
 

@@ -36,7 +36,7 @@ if len(user) > 0:
             data = json.loads(request_body)
 
             # Convert JSON data to YAML using the custom dumper
-            yaml_data = yaml.dump(data, Dumper=DoubleQuotedDumper, default_flow_style=False)
+            yaml_data = yaml.dump(data, Dumper=DoubleQuotedDumper, default_flow_style=False, sort_keys=False)
 
             # Define the file path
             file_path = '/tmp/user-config.yml'

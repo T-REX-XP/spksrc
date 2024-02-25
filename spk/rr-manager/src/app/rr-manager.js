@@ -90,27 +90,22 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     },
     handleFileUpload: async function (jsonData) {
         let url = `${this.API._prefix}uploadConfigFile.cgi`;
-        fetch(url, {
+        Ext.Ajax.request({
+            url: url,
             method: 'POST',
+            jsonData: jsonData, // Utilize jsonData for JSON payloads
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json' // Set the appropriate header
             },
-            body: JSON.stringify(jsonData),
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Network response was not ok.');
-            })
-            .then(data => {
-                console.log(data);
-                alert('JSON uploaded successfully');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error uploading JSON');
-            });
+            success: function(response) {
+                // Handle successful response
+                console.log('Success:', response.responseText);
+            },
+            failure: function(response) {
+                // Handle request failure
+                console.error('Error:', response.status, response.statusText);
+            }
+        });
     },
     createUploadPannel: function () {
         var that = this;
@@ -478,9 +473,9 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     dataIndex: 'installed',
                     renderer: function (value, metaData, record, row, col, store, gridView) {
                         if (!record.data.system)
-                        return '<input type="checkbox" class="grid-checkbox-installed" ' +
-                            (value ? 'checked="checked"' : '') +
-                            ' data-row="' + row + '" data-record-id="' + record.data.name + '"/>';
+                            return '<input type="checkbox" class="grid-checkbox-installed" ' +
+                                (value ? 'checked="checked"' : '') +
+                                ' data-row="' + row + '" data-record-id="' + record.data.name + '"/>';
                     }
                 }]
             }),

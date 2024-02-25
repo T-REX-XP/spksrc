@@ -14,7 +14,7 @@ print("Content-type: application/json\n")
 # # Function to read rr_version from a file
 def read_rr_version():
     try:
-        with open('/mnt/loader1/RR_VERSION', 'r') as file:
+        with open('/mnt/p1/RR_VERSION', 'r') as file:
             return file.read().strip()  # Read and strip newline characters
     except IOError as e:
         return f"Error reading RR_VERSION: {e}"
@@ -22,7 +22,7 @@ def read_rr_version():
 #Function to read user configuration from a YAML file
 def read_user_config():
     try:
-        with open('/mnt/loader1/user-config.yml', 'r') as file:
+        with open('/mnt/p1/user-config.yml', 'r') as file:
             return yaml.safe_load(file)  # Load and parse the YAML file
     except IOError as e:
         return f"Error reading user-config.yml: {e}"

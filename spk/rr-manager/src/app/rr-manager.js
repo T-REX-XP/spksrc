@@ -83,42 +83,34 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
         that['rrConfigNew'] = that['rrConfig'];
         that['rrConfigNew']['addons'] = newAddons;
-        //TODO: rewrite the config on the fs
+
+        this.handleFileUpload(that['rrConfigNew']);
+
         console.log('newRrConfig:', that['rrConfigNew']);
     },
-    handleFileUpload: async function (file, url, parent) {
-        const CHUNK_SIZE = 8 * 1024 * 1024; // 1MB
-        let start = 0;
-        while (start < file.size) {
-            let end = Math.min(file.size, start + CHUNK_SIZE);
-            let chunk = file.slice(start, end);
-
-            let formData = new FormData();
-            formData.append('file', chunk);
-            formData.append('filename', 'update.zip');
-            formData.append('create_parents', true);
-            formData.append('path', '/docker');
-            formData.append('overwrite', true);
-
-            // Include other parameters as needed
-            try {
-                const response = await fetch(url, { // Append your session ID (_sid) as required
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Content-Type': 'multipart/form-data;'
-                    }
-                });
-                if (!response.ok) throw new Error('Upload failed');
-                // Handle response here
-                console.log(`Uploaded chunk from ${start} to ${end}`);
-            } catch (error) {
-                console.error('Error uploading chunk', error);
-                parent.getEl().unmask();
-            }
-            start += CHUNK_SIZE;
-        }
-        parent.getEl().unmask();
+    handleFileUpload: async function (jsonData) {
+        let url = `${this.API._prefix}uploadConfigFile.cgi`;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData),
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => {
+                console.log(data);
+                alert('JSON uploaded successfully');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading JSON');
+            });
     },
     createUploadPannel: function () {
         var that = this;
@@ -181,7 +173,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         xtype: 'displayfield',
                         value: 'RR Version:',
                         width: 100,
-                    },{
+                    }, {
                         xtype: 'displayfield',
                         width: 100,
                         id: 'lbRrVersion'
@@ -402,54 +394,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createAddonsGrid: function () {
         var that = this;
         var currentLngCode = this._getLng(SYNO.SDS.UserSettings.data.Personal.lang);
-        var gridFields = [{
-            name: 'name',
-            type: 'string'
-        }, {
-            name: 'version',
-            type: 'string'
-        }, {
-            name: 'description',
-            type: 'object'
-        }, {
-            name: 'system',
-            type: 'boolean'
-        }, {
-            name: 'installed',
-            type: 'boolean'
-        }];
-        var gridColumns = [{
-            header: 'Name',
-            width: 60,
-            dataIndex: 'name'
-        }, {
-            header: 'Verison',
-            width: 30,
-            dataIndex: 'version'
-        }, {
-            header: 'Description',
-            width: 400,
-            dataIndex: 'description',
-            renderer: function (value, metaData, record, row, col, store, gridView) {
-                return value[currentLngCode] ?? value['en_US'];
-            }
-        }, {
-            header: 'System',
-            width: 30,
-            dataIndex: 'system',
-            renderer: function (value, metaData, record, row, col, store, gridView) {
-                return value ? '✔️' : '';
-            }
-        }, {
-            header: 'Installed',
-            width: 50,
-            dataIndex: 'installed',
-            renderer: function (value, metaData, record, row, col, store, gridView) {
-                return '<input type="checkbox" class="grid-checkbox-installed" ' +
-                    (value ? 'checked="checked"' : '') +
-                    ' data-row="' + row + '" data-record-id="' + record.data.name + '"/>';
-            }
-        }];
 
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
@@ -457,7 +401,22 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             restful: true,
             root: 'result',
             idProperty: 'name',
-            fields: gridFields
+            fields: [{
+                name: 'name',
+                type: 'string'
+            }, {
+                name: 'version',
+                type: 'string'
+            }, {
+                name: 'description',
+                type: 'object'
+            }, {
+                name: 'system',
+                type: 'boolean'
+            }, {
+                name: 'installed',
+                type: 'boolean'
+            }]
         });
         var paging = new SYNO.ux.PagingToolbar({
             store: gridStore,
@@ -491,7 +450,38 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     width: 180,
                     height: 20
                 },
-                columns: gridColumns
+                columns: [{
+                    header: 'Name',
+                    width: 60,
+                    dataIndex: 'name'
+                }, {
+                    header: 'Verison',
+                    width: 30,
+                    dataIndex: 'version'
+                }, {
+                    header: 'Description',
+                    width: 400,
+                    dataIndex: 'description',
+                    renderer: function (value, metaData, record, row, col, store, gridView) {
+                        return value[currentLngCode] ?? value['en_US'];
+                    }
+                }, {
+                    header: 'System',
+                    width: 30,
+                    dataIndex: 'system',
+                    renderer: function (value, metaData, record, row, col, store, gridView) {
+                        return value ? '✔️' : '';
+                    }
+                }, {
+                    header: 'Installed',
+                    width: 50,
+                    dataIndex: 'installed',
+                    renderer: function (value, metaData, record, row, col, store, gridView) {
+                        return '<input type="checkbox" class="grid-checkbox-installed" ' +
+                            (value ? 'checked="checked"' : '') +
+                            ' data-row="' + row + '" data-record-id="' + record.data.name + '"/>';
+                    }
+                }]
             }),
             viewConfig: {
                 forceFit: true,

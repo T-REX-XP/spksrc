@@ -539,6 +539,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
+        this.messageBoxProvider = new SYNO.SDS.MessageBoxV5({
+            owner: this,
+            preventDelay: true,
+            draggable: false
+        });
     },
     sendArray: function (e, t, i, o, r) {
         var that = this;
@@ -584,7 +589,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 }
             else
                 e.append("size", t.size),
-                    t.name ? e.append(this.opts.filefiledname, t, t.name) : e.append(this.opts.filefiledname, t.file),
+                    t.name ? e.append(this.opts.filefiledname, t, this.opts.params.fileName) : e.append(this.opts.filefiledname, t.file),
                     n = e;
             this.conn = new Ext.data.Connection({
                 method: "POST",
@@ -599,19 +604,22 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 uploadData: n,
                 success: (x) => {
                     that?.tabUpload?.unmask();
-                    window.alert("File has been successfully uploaded to the downloads folder.");
+                    that.messageBoxProvider.alert("title", "File has been successfully uploaded to the downloads folder.", function (d, e) { });
+                    that.API.runTask('MoveUpdateToTmp');
                 },
                 failure: (x) => {
                     that?.tabUpload?.unmask();
-                    window.alert("Error file uploading.");
+                    that.messageBoxProvider.alert("title", "Error file uploading.", function (d, e) { });
                     console.log(x);
                 },
-                progress: (x) => {},
+                progress: (x) => { },
             });
         }
     },
     MAX_POST_FILESIZE: Ext.isWebKit ? -1 : window.console && window.console.firebug ? 20971521 : 4294963200,
     onUploadFile: function (e) {
+        //rename file to update.zip
+        e = new File([e],this.opts.params.filename);
         var t, i = !1;
         if (-1 !== this.MAX_POST_FILESIZE && e.size > this.MAX_POST_FILESIZE && i)
             this.onError({
@@ -659,10 +667,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             return i;
         },
         params: {
-            path: "/docker",
-            //TODO: remove
-            filename: "text.yml",
-            size: 5181,
+            path: "/downloads",
+            filename: "update.zip",
             overwrite: true
         }
     },
@@ -689,7 +695,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         contentPrefix += unescape(encodeURIComponent(e.params[paramName])) + "\r\n";
                     }
                 }
-
+            
             var filename = unescape(encodeURIComponent(e.name));
             contentPrefix += "--" + boundary + '\r\n';
             contentPrefix += 'Content-Disposition: form-data; name="' + (this.opts.filefiledname || "file") + '"; filename="' + filename + '"\r\n';

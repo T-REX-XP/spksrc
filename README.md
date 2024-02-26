@@ -1,36 +1,48 @@
-# Discord
-SynoCommunity is now on Discord!
-
-[![Discord](https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge)](https://discord.gg/nnN9fgE7EF)
-
-# DSM 7
-DSM 7 was released on June 29 2021 as Version 7.0.41890.
-
 # Mount loader disk
 Create folowing tasks manually that must be runned behalf of `root`:
 
 - MountLoaderDisk:
 
 ```bash
-mkdir -p /tmp/p2
-mkdir -p /tmp/p3
-cd /dev
-mount synoboot1 /tmp/p2 2>/dev/null
-mount synoboot2 /tmp/p3 2>/dev/null
+echo 1 > /proc/sys/kernel/syno_install_flag
+mkdir -p /mnt/p1 /mnt/p2 /mnt/p3
+mount /dev/synoboot1 /mnt/p1 2>/dev/null
+mount /dev/synoboot2 /mnt/p2 2>/dev/null
+mount /dev/synoboot3 /mnt/p3 2>/dev/null
+export LOADER_DISK=/dev/synoboot
+export LOADER_DISK_PART1=/dev/synoboot1
+export LOADER_DISK_PART2=/dev/synoboot2
+export LOADER_DISK_PART3=/dev/synoboot3
 ```
 
 - UnMountLoaderDisk:
 
 ```bash
-umount /tmp/p1
-umount /tmp/p2
-umount /tmp/p3
+sync
+export LOADER_DISK=
+export LOADER_DISK_PART1=
+export LOADER_DISK_PART2=
+export LOADER_DISK_PART3=
+umount /mnt/p1 2>/dev/null
+umount /mnt/p2 2>/dev/null
+umount /mnt/p3 2>/dev/null
+rm -rf /mnt/p1 /mnt/p2 /mnt/p3
+echo 0 > /proc/sys/kernel/syno_install_flag
+```
 
-rm -rf /tmp/p1
-rm -rf /tmp/p2
-rm -rf /tmp/p3
+ - MoveUpdateToTmp
 
+```bash
+mv /volume1/downloads/update.zip /tmp
+chmod a+r /tmp/update.zip
 
+RR_RAMDISK_FILE="/mnt/p3/initrd-rr"
+RR_PATH="/tmp/initrd"
+mkdir -p "${RR_PATH}"
+(
+  cd "${RR_PATH}"
+  xz -dc <"${RR_RAMDISK_FILE}" | cpio -idm
+) >/dev/null 2>&1 || true
 ```
 
 

@@ -230,7 +230,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             xtype: 'syno_button',
                             btnStyle: 'blue',
                             text: 'Read RR Update File',
-                            handler: this.onReadUpdateFileClick.bind(this)
+                            handler: this.onRunRrUpdateManuallyClick.bind(this)
                         }]
                     }
                 ]
@@ -282,8 +282,40 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onRunTaskUnMountLoaderDiskClick: function () {
         this.API.runTask('UnMountLoaderDisk');
     },
+    _showUpdateconfirmDialog: function (text, yesCallback) {
+        var window = new SYNO.SDS.ModalWindow({
+            closeAction: "hide",
+            layout: "fit",
+            width: 400,
+            height: 200,
+            resizable: !1,
+            title: "RR Update confirmation dialog",
+            buttons: [{
+                text: "Cancel",
+                // Handle Cancel
+                handler: function () {
+                    window.close();
+                }
+            }, {
+                text: "Confirm",
+                itemId: "confirm",
+                btnStyle: "blue",
+                // Handle Confirm
+                handler: function () {
+                    if (yesCallback) yesCallback();
 
-    onReadUpdateFileClick: function () {
+                    window.close();
+                }
+            }],
+            items: [{
+                xtype: 'syno_displayfield',
+                value: text,
+            }
+            ],
+        });
+        window.open();
+    },
+    onRunRrUpdateManuallyClick: function () {
         that = this;
         this.API.callCustomScript('readUpdateFile.cgi', function (responseText) {
             if (!responseText) {
@@ -293,10 +325,24 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
             var configName = 'rrUpdateFileVersion';
             that[configName] = JSON.parse(responseText);
-            sessionStorage.setItem(configName, responseText);
-            window.alert("Update file version: " + that[configName].updateVersion);
-            // that.populateSystemInfoPanel(that[configName]);
+            let currentRrVersion = JSON.parse(sessionStorage.setItem('rrConfig'))?.user_config.rr_version;
+            let updateRrVersion = that[configName].updateVersion;
+
+            function runUpdate(){
+                console.log("--in Run update");
+                that.API.runTask('RunRrUpdate');
+                //TODO: run check progress in setinterval in 2 second
+                // setInterval(function(){
+                    this.API.callCustomScript('readUpdateFile.cgi', function (responseText) {
+                        
+                    });
+                // }, 2000);
+               
+            }
+            that._showUpdateconfirmDialog(
+                `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,runUpdate);
         });
+
     },
     // Call Python CGI on click
     onGetConfigClick: function () {
@@ -593,7 +639,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     n = e;
             this.conn = new Ext.data.Connection({
                 method: "POST",
-                url: "webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2&SynoToken=" + localStorage["SynoToken"],
+                url: `${that.API._baseUrl}api=SYNO.FileStation.Upload&method=upload&version=2&SynoToken=${localStorage["SynoToken"]}`,
                 defaultHeaders: l,
                 timeout: null
             });
@@ -619,7 +665,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     MAX_POST_FILESIZE: Ext.isWebKit ? -1 : window.console && window.console.firebug ? 20971521 : 4294963200,
     onUploadFile: function (e) {
         //rename file to update.zip
-        e = new File([e],this.opts.params.filename);
+        e = new File([e], this.opts.params.filename);
         var t, i = !1;
         if (-1 !== this.MAX_POST_FILESIZE && e.size > this.MAX_POST_FILESIZE && i)
             this.onError({
@@ -695,7 +741,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         contentPrefix += unescape(encodeURIComponent(e.params[paramName])) + "\r\n";
                     }
                 }
-            
+
             var filename = unescape(encodeURIComponent(e.name));
             contentPrefix += "--" + boundary + '\r\n';
             contentPrefix += 'Content-Disposition: form-data; name="' + (this.opts.filefiledname || "file") + '"; filename="' + filename + '"\r\n';

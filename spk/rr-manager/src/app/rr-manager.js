@@ -87,28 +87,25 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
         that['rrConfigNew'] = that['rrConfig']['user_config'];
         that['rrConfigNew']['addons'] = newAddons;
-
         this.handleFileUpload(that['rrConfigNew']);
-
-        console.log('newRrConfig:', that['rrConfigNew']);
     },
-    handleFileUpload: async function (jsonData) {
+    handleFileUpload: function (jsonData) {
         let url = `${this.API._prefix}uploadConfigFile.cgi`;
-        Ext.Ajax.request({
-            url: url,
-            method: 'POST',
-            jsonData: jsonData, // Utilize jsonData for JSON payloads
-            headers: {
-                'Content-Type': 'application/json' // Set the appropriate header
-            },
-            success: function (response) {
-                // Handle successful response
-                console.log('Success:', response.responseText);
-            },
-            failure: function (response) {
-                // Handle request failure
-                console.error('Error:', response.status, response.statusText);
-            }
+        return new Promise((resolve, reject) => {
+            Ext.Ajax.request({
+                url: url,
+                method: 'POST',
+                jsonData: jsonData,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (response) {
+                    resolve(Ext.decode(response.responseText));
+                },
+                failure: function (response) {
+                    reject('Failed with status: ' + response.status);
+                }
+            });
         });
     },
     createUploadPannel: function () {
@@ -257,21 +254,23 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 }
             });
         },
-        callCustomScript: function (scriptName, callback) {
-            Ext.Ajax.request({
-                url: `${this._prefix}${scriptName}`,
-                method: 'GET',
-                timeout: 60000,
-                headers: {
-                    'Content-Type': 'text/html'
-                },
-                success: function (response) {
-                    if (callback) callback(response.responseText);
+        callCustomScript: function (scriptName) {
 
-                },
-                failure: function (response) {
-                    window.alert('Request Failed.');
-                }
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: `${this._prefix}${scriptName}`,
+                    method: 'GET',
+                    timeout: 60000,
+                    headers: {
+                        'Content-Type': 'text/html'
+                    },
+                    success: function (response) {
+                        resolve(Ext.decode(response.responseText));
+                    },
+                    failure: function (response) {
+                        reject('Failed with status: ' + response.status);
+                    }
+                });
             });
         }
     },
@@ -303,7 +302,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 // Handle Confirm
                 handler: function () {
                     if (yesCallback) yesCallback();
-
                     window.close();
                 }
             }],
@@ -317,40 +315,37 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     },
     onRunRrUpdateManuallyClick: function () {
         that = this;
-        this.API.callCustomScript('readUpdateFile.cgi', function (responseText) {
+        this.API.callCustomScript('readUpdateFile.cgi').then((responseText) => {
             if (!responseText) {
                 window.alert('Unable to read the update file! Please upload file /tmp/update.zip and try againe.');
                 return;
             }
 
             var configName = 'rrUpdateFileVersion';
-            that[configName] = JSON.parse(responseText);
-            let currentRrVersion = JSON.parse(sessionStorage.setItem('rrConfig'))?.user_config.rr_version;
+            that[configName] = responseText;
+            let currentRrVersion = that["rrConfig"]?.rr_version;
             let updateRrVersion = that[configName].updateVersion;
 
-            function runUpdate() {
+            async function runUpdate() {
                 console.log('--in Run update');
                 that.API.runTask('RunRrUpdate');
                 //TODO: run check progress in setinterval in 2 second
                 //var interval = setInterval(function(){
-                this.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress', function (responseText) {
-                    // clearInterval(interval);
-                    console.log('--CheckUpdateStatus response status: ', responseText);
-                });
+                var responseText = await that.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress');
+                window.alert('--CheckUpdateStatus response status: '+ responseText.result.errmsg);
                 // }, 1000);
             }
             that._showUpdateconfirmDialog(
-                `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`, runUpdate);
+                `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,
+                runUpdate);
         });
-
     },
     // Call Python CGI on click
     onGetConfigClick: function () {
         that = this;
-        this.API.callCustomScript('getConfig.cgi', function (responseText) {
+        this.API.callCustomScript('getConfig.cgi').then((responseText) => {
             var configName = 'rrConfig';
-            that[configName] = JSON.parse(responseText);
-            sessionStorage.setItem(configName, responseText);
+            that[configName] = responseText;
             that.populateSystemInfoPanel(that[configName]);
         });
     },

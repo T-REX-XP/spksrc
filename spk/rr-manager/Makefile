@@ -48,6 +48,7 @@ rr-manager_extra_install:
 	install -m 755 src/app/getModules.cgi $(STAGING_DIR)/app/getModules.cgi
 	install -m 755 src/app/readUpdateFile.cgi $(STAGING_DIR)/app/readUpdateFile.cgi
 	install -m 755 src/app/uploadConfigFile.cgi $(STAGING_DIR)/app/uploadConfigFile.cgi
+	install -m 755 src/app/checkUpdateStatus.cgi $(STAGING_DIR)/app/checkUpdateStatus.cgi
 	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi
 	install -m 755 src/app/externalapi.cgi $(STAGING_DIR)/app/externalapi.cgi
 	install -m 755 src/app/storepythonsqlapi.cgi $(STAGING_DIR)/app/storepythonsqlapi.cgi

@@ -328,19 +328,19 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             let currentRrVersion = JSON.parse(sessionStorage.setItem('rrConfig'))?.user_config.rr_version;
             let updateRrVersion = that[configName].updateVersion;
 
-            function runUpdate(){
-                console.log("--in Run update");
+            function runUpdate() {
+                console.log('--in Run update');
                 that.API.runTask('RunRrUpdate');
                 //TODO: run check progress in setinterval in 2 second
-                // setInterval(function(){
-                    this.API.callCustomScript('readUpdateFile.cgi', function (responseText) {
-                        
-                    });
-                // }, 2000);
-               
+                //var interval = setInterval(function(){
+                this.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress', function (responseText) {
+                    // clearInterval(interval);
+                    console.log('--CheckUpdateStatus response status: ', responseText);
+                });
+                // }, 1000);
             }
             that._showUpdateconfirmDialog(
-                `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,runUpdate);
+                `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`, runUpdate);
         });
 
     },

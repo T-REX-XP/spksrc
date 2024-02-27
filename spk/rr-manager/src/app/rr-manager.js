@@ -133,9 +133,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     var form = myFormPanel.getForm();
                     var fileObject = form.el.dom[1].files[0];
                     if (!form.isValid()) return;
-                    that.tabUpload.mask(_T("common", "loading"), "x-mask-loading");
+                    that.getEl().mask(_T("common", "loading"), "x-mask-loading");
                     that.onUploadFile(fileObject);
-                    //TODO: implement sending file to /tmp/ with name update.zip
                 }
             }]
         });
@@ -226,7 +225,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         }, {
                             xtype: 'syno_button',
                             btnStyle: 'blue',
-                            text: 'Read RR Update File',
+                            text: 'Force RR Update',
                             handler: this.onRunRrUpdateManuallyClick.bind(this)
                         }]
                     }
@@ -250,7 +249,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     if (callback) callback(response.responseText);
                 },
                 failure: function (response) {
-                    window.alert('Request Failed to mount loader disk.');
+                    that.showMsg('Erro','Request Failed to mount loader disk.');
                 }
             });
         },
@@ -265,7 +264,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         'Content-Type': 'text/html'
                     },
                     success: function (response) {
-                        resolve(Ext.decode(response.responseText));
+                        // if response text is string need to decode it
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+
                     },
                     failure: function (response) {
                         reject('Failed with status: ' + response.status);
@@ -281,14 +286,14 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onRunTaskUnMountLoaderDiskClick: function () {
         this.API.runTask('UnMountLoaderDisk');
     },
-    _showUpdateconfirmDialog: function (text, yesCallback) {
+    _showUpdateConfirmDialog: function (text, yesCallback) {
         var window = new SYNO.SDS.ModalWindow({
             closeAction: "hide",
             layout: "fit",
             width: 400,
             height: 200,
             resizable: !1,
-            title: "RR Update confirmation dialog",
+            title: "Confirm update",
             buttons: [{
                 text: "Cancel",
                 // Handle Cancel
@@ -317,7 +322,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         that = this;
         this.API.callCustomScript('readUpdateFile.cgi').then((responseText) => {
             if (!responseText) {
-                window.alert('Unable to read the update file! Please upload file /tmp/update.zip and try againe.');
+                that.showMsg('Error','Unable to read the update file! Please upload file /tmp/update.zip and try againe.');
                 return;
             }
 
@@ -327,15 +332,30 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             let updateRrVersion = that[configName].updateVersion;
 
             async function runUpdate() {
-                console.log('--in Run update');
+                //show the spinner
+                that.getEl().mask(_T("common", "loading"), "x-mask-loading");
                 that.API.runTask('RunRrUpdate');
-                //TODO: run check progress in setinterval in 2 second
-                //var interval = setInterval(function(){
-                var responseText = await that.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress');
-                window.alert('--CheckUpdateStatus response status: '+ responseText.result.errmsg);
-                // }, 1000);
+                var maxCountOfRefreshUpdateStatus = 50;
+                var countUpdatesStatusAttemp = 0;
+
+                var updateStatusInterval = setInterval(async function () {
+                    var checksStatusResponse = await that.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress');
+                    var response = checksStatusResponse.result;
+                    //response {"progress": "-2", "progressmsg": "Update file unzip failed!"}
+                    that.getEl().mask(`Update RR in progress: ${response?.progress}. \nStatus${response?.progressmsg}`, "x-mask-loading");
+                    console.log(`--CheckUpdateStatus progress: ${response?.progress}, ${response?.progressmsg}`);
+                    countUpdatesStatusAttemp++;
+                    if (countUpdatesStatusAttemp == maxCountOfRefreshUpdateStatus || response?.progress?.startsWith("-")) {
+                        clearInterval(updateStatusInterval);
+                        that?.getEl()?.unmask();
+                        that.showMsg("title", `Unable to update RR. Status code: ${response?.progress},\nReason: ${response?.progressmsg}`,);
+                    } else if (response?.progress == "100") {
+                        that?.getEl()?.unmask();
+                        that.showMsg("title", `The RR has been successfully updated. Please restart the PC.`);
+                    }
+                }, 1000);
             }
-            that._showUpdateconfirmDialog(
+            that._showUpdateConfirmDialog(
                 `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,
                 runUpdate);
         });
@@ -580,11 +600,10 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
-        this.messageBoxProvider = new SYNO.SDS.MessageBoxV5({
-            owner: this,
-            preventDelay: true,
-            draggable: false
-        });
+    },
+    showMsg(title, msg) {
+        return new SYNO.SDS.MessageBoxV5()
+            .alert(title, msg);
     },
     sendArray: function (e, t, i, o, r) {
         var that = this;
@@ -644,13 +663,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 chunkmode: t.chunkmode,
                 uploadData: n,
                 success: (x) => {
-                    that?.tabUpload?.unmask();
-                    that.messageBoxProvider.alert("title", "File has been successfully uploaded to the downloads folder.", function (d, e) { });
+                    that?.getEl()?.unmask();
+                    that.showMsg("title", "File has been successfully uploaded to the downloads folder.");
                     that.API.runTask('MoveUpdateToTmp');
                 },
                 failure: (x) => {
-                    that?.tabUpload?.unmask();
-                    that.messageBoxProvider.alert("title", "Error file uploading.", function (d, e) { });
+                    that?.getEl()?.unmask();
+                    that.showMsg("title", "Error file uploading.");
                     console.log(x);
                 },
                 progress: (x) => { },

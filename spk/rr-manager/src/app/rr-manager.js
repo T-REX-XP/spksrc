@@ -249,7 +249,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     if (callback) callback(response.responseText);
                 },
                 failure: function (response) {
-                    that.showMsg('Erro','Request Failed to mount loader disk.');
+                    that.showMsg('Erro', 'Request Failed to mount loader disk.');
                 }
             });
         },
@@ -270,10 +270,15 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         } else {
                             resolve(response?.responseText);
                         }
-
                     },
-                    failure: function (response) {
-                        reject('Failed with status: ' + response.status);
+                    failure: function (result) {
+                        if (typeof result?.responseText === 'string' && result?.responseText) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + response.status);
+                        }
                     }
                 });
             });
@@ -286,7 +291,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onRunTaskUnMountLoaderDiskClick: function () {
         this.API.runTask('UnMountLoaderDisk');
     },
-    _showUpdateConfirmDialog: function (text, yesCallback) {
+    showMsg(title, msg) {
+        return new SYNO.SDS.MessageBoxV5()
+            .alert(title, msg);
+    },
+    showPrompt: function (text, yesCallback) {
         var window = new SYNO.SDS.ModalWindow({
             closeAction: "hide",
             layout: "fit",
@@ -322,7 +331,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         that = this;
         this.API.callCustomScript('readUpdateFile.cgi').then((responseText) => {
             if (!responseText) {
-                that.showMsg('Error','Unable to read the update file! Please upload file /tmp/update.zip and try againe.');
+                that.showMsg('Error', 'Unable to read the update file! Please upload file /tmp/update.zip and try againe.');
                 return;
             }
 
@@ -355,9 +364,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     }
                 }, 1000);
             }
-            that._showUpdateConfirmDialog(
+            that.showPrompt(
                 `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,
                 runUpdate);
+        }).catch(error => {
+            that.showMsg("title", `Error. ${error}`);
         });
     },
     // Call Python CGI on click
@@ -601,10 +612,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
     },
-    showMsg(title, msg) {
-        return new SYNO.SDS.MessageBoxV5()
-            .alert(title, msg);
-    },
+
     sendArray: function (e, t, i, o, r) {
         var that = this;
         if ("CANCEL" !== t.status) {

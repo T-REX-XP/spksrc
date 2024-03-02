@@ -52,6 +52,7 @@ rr-manager_extra_install:
 	install -m 644 src/app/rr-manager.js $(STAGING_DIR)/app/rr-manager.js
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
 	install -m 755 src/app/createsqlitedata.sql $(STAGING_DIR)/app/createsqlitedata.sql
+	install -m 755 src/app/createsqlitedata.cgi $(STAGING_DIR)/app/createsqlitedata.cgi
 	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \

@@ -113,7 +113,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createUploadPannel: function () {
         var that = this;
         var myFormPanel = new Ext.form.FormPanel({
-            renderTo: document.body,
+            renderTo: Ext.getBody(),
             title: 'Please upload the update file:',
             url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
             height: '100%',
@@ -149,7 +149,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
         return new SYNO.ux.FieldSet({
             collapsible: true,
-            renderTo: document.body,
+            renderTo: Ext.getBody(),
             title: 'Device Information',
             id: 'deviceInfoPanel',
             name: 'deviceInfoPanel',
@@ -274,6 +274,20 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             handler: this.onRunRrUpdateManuallyClick.bind(this)
                         }]
                     },
+                    {
+                        xtype: 'syno_compositefield',
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Clean up system partition:',
+                            width: 140
+                        }, {
+                            xtype: 'syno_button',
+                            btnStyle: 'red',
+                            text: 'Run Clean Up',
+                            handler: this.onRunCleanUpSystemPartition.bind(this)
+                        }]
+                    }
                     {
                         xtype: 'syno_compositefield',
                         hideLabel: true,
@@ -485,6 +499,12 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             });
 
         }
+    },
+    onRunCleanUpSystemPartition: function () {
+        var that = this;
+        this.API.callCustomScript("createsqlitedata.cgi")
+                .then((x) => that.showMsg("Done", `The script has been createsqlitedata runned.`))
+                .catch((e) => that.showMsg("Error", `Unable to run createsqlitedata script. ${e}`));
     },
     onRunCleanUpSystemPartition: function () {
         var that = this;

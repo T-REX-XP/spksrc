@@ -1,6 +1,6 @@
 SPK_NAME = rr-manager
-SPK_VERS = 0.7
-SPK_REV = 17
+SPK_VERS = 1.0
+SPK_REV = 01
 SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -42,22 +42,16 @@ rr-manager_extra_install:
 
 	install -m 755 -d $(STAGING_DIR)/app/
 	install -m 755 -d $(STAGING_DIR)/app/libs/
-	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
 	install -m 755 src/app/getConfig.cgi $(STAGING_DIR)/app/getConfig.cgi
 	install -m 755 src/app/getAddons.cgi $(STAGING_DIR)/app/getAddons.cgi
 	install -m 755 src/app/getModules.cgi $(STAGING_DIR)/app/getModules.cgi
 	install -m 755 src/app/readUpdateFile.cgi $(STAGING_DIR)/app/readUpdateFile.cgi
 	install -m 755 src/app/uploadConfigFile.cgi $(STAGING_DIR)/app/uploadConfigFile.cgi
 	install -m 755 src/app/checkUpdateStatus.cgi $(STAGING_DIR)/app/checkUpdateStatus.cgi
-	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi
-	install -m 755 src/app/externalapi.cgi $(STAGING_DIR)/app/externalapi.cgi
-	install -m 755 src/app/storepythonsqlapi.cgi $(STAGING_DIR)/app/storepythonsqlapi.cgi
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/rr-manager.js $(STAGING_DIR)/app/rr-manager.js
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
 	install -m 755 src/app/createsqlitedata.sql $(STAGING_DIR)/app/createsqlitedata.sql
-	install -m 755 src/app/storepythonsynoapi.cgi $(STAGING_DIR)/app/storepythonsynoapi.cgi
-	install -m 755 src/app/storebashratesapi.cgi $(STAGING_DIR)/app/storebashratesapi.cgi
 	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \

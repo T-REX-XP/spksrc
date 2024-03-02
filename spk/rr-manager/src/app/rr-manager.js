@@ -298,7 +298,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         hideLabel: true,
                         items: [{
                             xtype: 'syno_displayfield',
-                            value: 'Crate SQL test',
+                            value: '(TEST)Create SQL test',
                             width: 140
                         }, {
                             xtype: 'syno_button',

@@ -134,8 +134,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 handler: function () {
                     var form = myFormPanel.getForm();
                     var fileObject = form.el.dom[1].files[0];
-                    if (!form.isValid()){
-                        that.showMsg('error','Please select the update/updateAll file before start uploading.');
+                    if (!form.isValid()) {
+                        that.showMsg('error', 'Please select the update/updateAll file before start uploading.');
                         return;
                     }
                     that.getEl().mask(_T("common", "loading"), "x-mask-loading");
@@ -447,6 +447,44 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 });
             });
         },
+        rebootSystem: function () {
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: this._baseUrl,
+                    method: 'POST',
+                    jsonData: {
+                        api: SYNO.Core.System,
+                        method: reboot,
+                        version: 2,
+                        force: false,
+                        local: true,
+                        firmware_upgrade: false,
+                        cache_check_shutdown: false
+                    },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': '*/*'
+                    },
+                    success: function (response) {
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+                    },
+                    failure: function (response) {
+                        if (typeof result?.responseText === 'string' && result?.responseText) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + response.status);
+                        }
+                    }
+                });
+            });
+
+        }
     },
     onRunCleanUpSystemPartition: function () {
         var that = this;

@@ -1,6 +1,6 @@
 SPK_NAME = rr-manager
 SPK_VERS = 1.0
-SPK_REV = 01
+SPK_REV = 02
 SPK_ICON = src/rr-manager.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -13,7 +13,7 @@ SPK_DEPENDS = "python311>=3.11.5-8"
 
 MAINTAINER = T-REX-XP
 
-DESCRIPTION = RRManager Application demo to illustrate the usage of Syno ExtJS framework for DSM applications. This package is for experienced users.
+DESCRIPTION = RRManager is a Redpill Recovery DSM application aimed to provide the ability to configure/update RR without booting to RR recovery. This package is for experienced users.
 STARTABLE = no
 DISPLAY_NAME = RRManager
 

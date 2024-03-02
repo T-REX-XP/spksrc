@@ -56,23 +56,25 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             return allTabs;
         }).call(this);
 
+        Ext.util.CSS.createStyleSheet('.my-icon { background-image: url("webman/3rdparty/StorageManager/images/default/1x/overview_status.png") !important; }');
+        Ext.util.CSS.createStyleSheet('.lb-title { font-weight: bold; }');
+
         config = Ext.apply({
             resizable: true,
             maximizable: true,
             minimizable: true,
             width: 640,
             height: 640,
-            items: [{
-                xtype: 'syno_displayfield',
-                value: 'Welcome to the RR Manager App!'
-            },
-            {
-                xtype: 'syno_tabpanel',
-                activeTab: 0,
-                plain: true,
-                items: this.tabs,
-                deferredRender: true
-            }
+            items: [
+
+                // systemInfoPannel,
+                {
+                    xtype: 'syno_tabpanel',
+                    activeTab: 0,
+                    plain: true,
+                    items: this.tabs,
+                    deferredRender: true
+                }
             ]
         }, config);
 
@@ -134,11 +136,10 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     var fileObject = form.el.dom[1].files[0];
                     if (!form.isValid()) return;
                     that.getEl().mask(_T("common", "loading"), "x-mask-loading");
-                    that.onUploadFile(fileObject);
+                    that.onUploadFile(fileObject, that);
                 }
             }]
         });
-        this.tabUpload = myFormPanel.getForm().getEl();
         return myFormPanel;
     },
     createSystemInfoPannel: function () {
@@ -152,7 +153,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             // width: 600,
             frame: true,
             labelWidth: 130,
-            bodyStyle: 'padding:10px;',
+            // bodyStyle: 'padding:10px;',
             autoScroll: true,
             items: []
         });
@@ -160,23 +161,64 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     // Create the display of CGI calls
     createGeneralSection: function () {
         return new SYNO.ux.FieldSet({
-            title: 'General',
-            collapsible: true,
+            // title: 'General',
+            // collapsible: true,
             items: [
-                // TextField
                 {
-                    xtype: 'syno_compositefield',
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'displayfield',
-                        value: 'RR Version:',
-                        width: 100,
-                    }, {
-                        xtype: 'displayfield',
-                        width: 100,
-                        id: 'lbRrVersion'
-                    }]
-                }
+                    xtype: 'syno_panel',
+                    style: 'padding: 10px; margin: 10px; border-radius: 2px; box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5);',
+                    activeTab: 0,
+                    plain: true,
+                    items: [
+                        {
+                            xtype: 'syno_compositefield',
+                            hideLabel: true,
+                            items: [
+                                {
+                                    xtype: 'syno_displayfield',
+                                    cls: 'my-icon',
+                                    width: 48,
+                                    height: 48
+                                },
+                                {
+                                    xtype: 'syno_displayfield',
+                                    cls: 'lb-title',
+                                    value: 'Welcome to RR Manager!',
+                                    width: 200,
+                                }]
+                        }, {
+                            xtype: 'syno_compositefield',
+                            hideLabel: true,
+                            items: [
+                                {
+                                    xtype: 'syno_displayfield',
+                                    value: 'RR v.',
+                                    cls: 'lb-title',
+                                    width: 40,
+                                }, {
+                                    xtype: 'syno_displayfield',
+                                    width: 50,
+                                    id: 'lbRrVersion'
+                                }, {
+                                    xtype: 'syno_displayfield',
+                                    width: 100,
+                                    cls: 'lb-title',
+                                    value: 'System Info:'
+                                }, {
+                                    xtype: 'syno_displayfield',
+                                    width: 500,
+                                    id: 'lbSystemInfo',
+                                    value: 'Loading...'
+                                }, {
+                                    xtype: 'syno_displayfield',
+                                    width: 2,
+                                    id: 'spacer',
+                                    value: ' '
+                                }]
+                        },
+                    ],
+                    deferredRender: true
+                },
             ]
         });
     },
@@ -228,6 +270,20 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             text: 'Force RR Update',
                             handler: this.onRunRrUpdateManuallyClick.bind(this)
                         }]
+                    },
+                    {
+                        xtype: 'syno_compositefield',
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Clean up system partition:',
+                            width: 140
+                        }, {
+                            xtype: 'syno_button',
+                            btnStyle: 'red',
+                            text: 'Run Clean Up',
+                            handler: this.onRunCleanUpSystemPartition.bind(this)
+                        }]
                     }
                 ]
         });
@@ -253,6 +309,38 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 }
             });
         },
+        getUpdateFileInfo: function (file) {
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: `${this._prefix}readUpdateFile.cgi`,
+                    method: 'GET',
+                    timeout: 60000,
+                    params: {
+                        file: file
+                    },
+                    headers: {
+                        'Content-Type': 'text/html'
+                    },
+                    success: function (response) {
+                        // if response text is string need to decode it
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+                    },
+                    failure: function (result) {
+                        if (typeof result?.responseText === 'string' && result?.responseText) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + response?.status);
+                        }
+                    }
+                });
+            });
+        },
         callCustomScript: function (scriptName) {
 
             return new Promise((resolve, reject) => {
@@ -272,6 +360,45 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         }
                     },
                     failure: function (result) {
+                        if (typeof result?.responseText === 'string' && result?.responseText && !result?.responseText.startsWith('<')) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + result?.status);
+                        }
+                    }
+                });
+            });
+        },
+        getSharesList: function () {
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: this._baseUrl,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': '*/*'
+                    },
+                    params: {
+                        api: 'SYNO.FileStation.List',
+                        method: 'list_share',
+                        version: 2,
+                        filetype: 'dir', // URL-encode special characters if needed
+                        sort_by: 'name',
+                        check_dir: true,
+                        additional: '["real_path","owner","time","perm","mount_point_type","sync_share","volume_status","indexed","hybrid_share","worm_share"]',
+                        enum_cluster: true,
+                        node: 'fm_root'
+                    },
+                    success: function (response) {
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+                    },
+                    failure: function (response) {
                         if (typeof result?.responseText === 'string' && result?.responseText) {
                             var response = Ext.decode(result?.responseText);
                             reject(response?.error);
@@ -282,9 +409,50 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     }
                 });
             });
-        }
+        },
+        //api=SYNO.DSM.Info&method=getinfo&version=2
+        getSytemInfo: function () {
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: this._baseUrl,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': '*/*'
+                    },
+                    params: {
+                        api: 'SYNO.DSM.Info',
+                        method: 'getinfo',
+                        version: 2
+                    },
+                    success: function (response) {
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+                    },
+                    failure: function (response) {
+                        if (typeof result?.responseText === 'string' && result?.responseText) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + response.status);
+                        }
+                    }
+                });
+            });
+        },
     },
-
+    onRunCleanUpSystemPartition: function () {
+        var that = this;
+        this.showPrompt("Would you like to run clean up sustem partition script?", x => {
+            this.API.callCustomScript("clean_system_disk.cgi")
+                .then((x) => that.showMsg("Done", `The script has been successfully runned.`))
+                .catch((e) => that.showMsg("Error", `Unable to run cleanup script. ${e}`));
+        });
+    },
     onRunTaskMountLoaderDiskClick: function () {
         this.API.runTask('MountLoaderDisk');
     },
@@ -327,14 +495,17 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         });
         window.open();
     },
+    rrUpdateFileName: "update.zip",
+    rrTmpFolder: "tmp_rr_update",
+    updateFileRealPath: function () {
+        return `${this.downloadFolderRealPath}/${this.rrTmpFolder}/${this.rrUpdateFileName}`;
+    },
+    uploadFilePatch: function () {
+        return `/downloads/${this.rrTmpFolder}`;
+    },
     onRunRrUpdateManuallyClick: function () {
         that = this;
-        this.API.callCustomScript('readUpdateFile.cgi').then((responseText) => {
-            if (!responseText) {
-                that.showMsg('Error', 'Unable to read the update file! Please upload file /tmp/update.zip and try againe.');
-                return;
-            }
-
+        this.API.getUpdateFileInfo(that.updateFileRealPath()).then((responseText) => {
             var configName = 'rrUpdateFileVersion';
             that[configName] = responseText;
             let currentRrVersion = that["rrConfig"]?.rr_version;
@@ -350,17 +521,16 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 var updateStatusInterval = setInterval(async function () {
                     var checksStatusResponse = await that.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress');
                     var response = checksStatusResponse.result;
-                    //response {"progress": "-2", "progressmsg": "Update file unzip failed!"}
-                    that.getEl().mask(`Update RR in progress: ${response?.progress}. \nStatus${response?.progressmsg}`, "x-mask-loading");
-                    console.log(`--CheckUpdateStatus progress: ${response?.progress}, ${response?.progressmsg}`);
+                    that.getEl().mask(`Update RR in progress: ${response?.progress}. \nStatus${response?.progressmsg}`, 'x-mask-loading');
                     countUpdatesStatusAttemp++;
-                    if (countUpdatesStatusAttemp == maxCountOfRefreshUpdateStatus || response?.progress?.startsWith("-")) {
+                    if (countUpdatesStatusAttemp == maxCountOfRefreshUpdateStatus || response?.progress?.startsWith('-')) {
                         clearInterval(updateStatusInterval);
                         that?.getEl()?.unmask();
-                        that.showMsg("title", `Unable to update RR. Status code: ${response?.progress},\nReason: ${response?.progressmsg}`,);
-                    } else if (response?.progress == "100") {
+                        that.showMsg('title', `Unable to update RR. Status code: ${response?.progress},\nReason: ${response?.progressmsg}`,);
+                    } else if (response?.progress == '100') {
                         that?.getEl()?.unmask();
-                        that.showMsg("title", `The RR has been successfully updated. Please restart the PC.`);
+                        clearInterval(updateStatusInterval);
+                        that.showMsg('title', `The RR has been successfully updated. Please restart the PC.`);
                     }
                 }, 1000);
             }
@@ -368,7 +538,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,
                 runUpdate);
         }).catch(error => {
-            that.showMsg("title", `Error. ${error}`);
+            that.showMsg('title', `Error. ${error}`);
         });
     },
     // Call Python CGI on click
@@ -606,11 +776,25 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         };
         return new SYNO.ux.GridPanel(c);
     },
-
     onOpen: function (a) {
+        var that = this;
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
+        this.API.getSharesList().then(x => {
+            var sharesList = x.data.shares;
+            var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == '/downloads');
+            if (!downloadsShareMetadata) {
+                this.showMsg('error', 'The "downloads" share not found. Please create the share and restart the app.');
+                return;
+            }
+            that.downloadFolderRealPath = downloadsShareMetadata?.additional.real_path;
+        });
+        that.API.getSytemInfo().then((x) => {
+            that['synoInfo'] = x.data;
+            //lbRrVersion
+            Ext.getCmp('lbSystemInfo').setValue(`Model: ${x.data.model}, RAM: ${x.data.ram} Gb, DSM version: ${x.data.version_string} `);
+        });
     },
 
     sendArray: function (e, t, i, o, r) {
@@ -660,8 +844,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     t.name ? e.append(this.opts.filefiledname, t, this.opts.params.fileName) : e.append(this.opts.filefiledname, t.file),
                     n = e;
             this.conn = new Ext.data.Connection({
-                method: "POST",
-                url: `${that.API._baseUrl}api=SYNO.FileStation.Upload&method=upload&version=2&SynoToken=${localStorage["SynoToken"]}`,
+                method: 'POST',
+                url: `${that.API._baseUrl}api=SYNO.FileStation.Upload&method=upload&version=2&SynoToken=${localStorage['SynoToken']}`,
                 defaultHeaders: l,
                 timeout: null
             });
@@ -672,8 +856,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 uploadData: n,
                 success: (x) => {
                     that?.getEl()?.unmask();
-                    that.showMsg("title", "File has been successfully uploaded to the downloads folder.");
-                    that.API.runTask('MoveUpdateToTmp');
+                    this.showPrompt(`File has been successfully uploaded to the downloads folder.
+                                Would you like to run update procedure?`, x => this.onRunRrUpdateManuallyClick());
                 },
                 failure: (x) => {
                     that?.getEl()?.unmask();
@@ -685,7 +869,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         }
     },
     MAX_POST_FILESIZE: Ext.isWebKit ? -1 : window.console && window.console.firebug ? 20971521 : 4294963200,
-    onUploadFile: function (e) {
+    onUploadFile: function (e, that) {
+        //create rr tmp folder
+        SYNO.API.currentManager.requestAPI("SYNO.FileStation.CreateFolder", "create", "2", {
+            folder_path: "/downloads",
+            name: that.rrTmpFolder,
+            force_parent: false
+        });
         //rename file to update.zip
         e = new File([e], this.opts.params.filename);
         var t, i = !1;
@@ -734,8 +924,9 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             var i = new FileObj(t, { mtime: mtime });
             return i;
         },
+        //TODO: remove hard coding
         params: {
-            path: "/downloads",
+            path: "/downloads/tmp_rr_update",
             filename: "update.zip",
             overwrite: true
         }

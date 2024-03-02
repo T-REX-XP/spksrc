@@ -30,22 +30,6 @@ rm -rf /mnt/p1 /mnt/p2 /mnt/p3
 echo 0 > /proc/sys/kernel/syno_install_flag
 ```
 
- - MoveUpdateToTmp
-
-```bash
-mv /volume1/downloads/update.zip /tmp
-chmod a+r /tmp/update.zip
-
-RR_RAMDISK_FILE="/mnt/p3/initrd-rr"
-RR_PATH="/tmp/initrd"
-mkdir -p "${RR_PATH}"
-(
-  cd "${RR_PATH}"
-  xz -dc <"${RR_RAMDISK_FILE}" | cpio -idm
-) >/dev/null 2>&1 || true
-```
-
-
 ## In SynoCommunity some packages are available for DSM 7 but some are not.
 * You find the status of the packages in the issue [#4524] **Meta: DSM7 package status**
 * If you are running DSM7, some packages that are not compatible may continue appear in the Package Center of your Disk Station.

@@ -3,39 +3,44 @@
 import os
 import json
 import sys
+from urllib.parse import parse_qs, unquote
 import zipfile
-
 from pathlib import Path
 path_root = Path(__file__).parents[1]
 sys.path.append(str(path_root)+'/libs')
 
 import libs.yaml as yaml
-
-# Function to print the error and exit, simulating a 400 response
-def print_error_and_exit(message):
-    print("Status: 400 Bad Request")  # Attempt to set status, server might not honor this
-    print("Content-type: application/json\n")
-    response = {'error': message, 'success': False}
-    print(json.dumps(response))
-    sys.exit(1)  # Exiting with a non-zero status code
+print("Content-type: application/json\n")
+response = {}
+response['success'] = False
+#Function to read user configuration from a YAML file
+def read_update_info(fileName):
+    try:
+        with zipfile.ZipFile(fileName, mode="r") as zif:
+            for lines in zif.read("RR_VERSION").split(b"\r\n"):
+                response['updateVersion'] = lines.strip().decode('utf-8')
+                response['success'] = True
+    except:
+        response["error"] = 'File ' +fileName +' not found.'
 
 # Authenticate the user
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()
-FILE_NAME = "/tmp/update.zip"
-response = {}
 
-if len(user) == 0:
-    print_error_and_exit("not authenticated")
 
-try:
-    with zipfile.ZipFile(FILE_NAME, mode="r") as zif:
-        for lines in zif.read("RR_VERSION").split(b"\r\n"):
-            response['updateVersion'] = lines.strip().decode('utf-8')
-            response['success'] = True
-except FileNotFoundError:
-    print_error_and_exit(f'File {FILE_NAME} not found.')
 
-# If the script reaches this point, print the success header and response
-print("Content-type: application/json\n")
+if len(user) > 0:
+    response["status"] = "authenticated"
+    response["user"] = user
+    # Extract query string from environment variable
+    query_string = os.environ.get('QUERY_STRING', '')
+    query_params = parse_qs(query_string)
+    file_name_encoded = query_params.get('file', [None])[0]
+    file_name = unquote(file_name_encoded)
+    response["file_from_params"] = file_name
+    read_update_info(file_name)
+else:
+    response["status"] = "not authenticated"
+
+# Print the JSON response
 print(json.dumps(response))

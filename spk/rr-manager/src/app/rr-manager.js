@@ -49,7 +49,14 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 id: "tabUpdate",
                 name: "tabUpdate",
                 items: [
-                    this.createUploadPannel()
+                    {
+                        xtype: 'syno_compositefield',
+                        hideLabel: true,
+                        height: 100,
+                        items: [
+                            this.createUploadPannel()
+                        ]
+                    }
                 ]
             });
 
@@ -66,8 +73,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             width: 640,
             height: 640,
             items: [
-
-                // systemInfoPannel,
                 {
                     xtype: 'syno_tabpanel',
                     activeTab: 0,
@@ -113,13 +118,16 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createUploadPannel: function () {
         var that = this;
         var myFormPanel = new Ext.form.FormPanel({
-            renderTo: Ext.getBody(),
-            title: 'Please upload the update file:',
+            title: 'Please select the update file:',
             url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
-            height: '100%',
+            height:'80%',
             fileUpload: true,
-            width: 400,
+            width: '100%',
             border: !1,
+            layout : {
+                type :'vbox',
+                align: 'center'               
+             },
             bodyPadding: 10,
             items: [{
                 xtype: 'syno_filebutton',
@@ -149,14 +157,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
         return new SYNO.ux.FieldSet({
             collapsible: true,
-            renderTo: Ext.getBody(),
             title: 'Device Information',
             id: 'deviceInfoPanel',
             name: 'deviceInfoPanel',
-            // width: 600,
             frame: true,
             labelWidth: 130,
-            // bodyStyle: 'padding:10px;',
             autoScroll: true,
             items: []
         });
@@ -503,8 +508,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onRunCreateSQL: function () {
         var that = this;
         this.API.callCustomScript("createsqlitedata.cgi")
-                .then((x) => that.showMsg("Done", `The script has been createsqlitedata runned.`))
-                .catch((e) => that.showMsg("Error", `Unable to run createsqlitedata script. ${e}`));
+            .then((x) => that.showMsg("Done", `The script has been createsqlitedata runned.`))
+            .catch((e) => that.showMsg("Error", `Unable to run createsqlitedata script. ${e}`));
     },
     onRunCleanUpSystemPartition: function () {
         var that = this;
@@ -765,7 +770,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     dataIndex: 'version'
                 }, {
                     header: 'Description',
-                    width: 400,
+                    width: 300,
                     dataIndex: 'description',
                     renderer: function (value, metaData, record, row, col, store, gridView) {
                         return value[currentLngCode] ?? value['en_US'];
@@ -805,7 +810,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             frame: false,
             bbar: paging,
             height: 400,
-            renderTo: Ext.getBody(),
             cls: 'resource-monitor-performance',
             listeners: {
                 scope: this,

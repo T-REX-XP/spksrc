@@ -17,7 +17,6 @@ response = {}
 response['success'] = False
 
 if len(user) > 0:
-    response["status"] = "not authenticated"
     try:
         con = sqlite3.connect('/usr/syno/etc/esynoscheduler/esynoscheduler.db')
         cur = con.cursor()
@@ -31,8 +30,8 @@ if len(user) > 0:
         # Save the changes
         con.commit()
         response['success'] = True
-    except e:
-        response["error"] = e
+    except:
+        response["error"] ="error"
 else:
     response["status"] = "not authenticated"
 # Print the JSON response

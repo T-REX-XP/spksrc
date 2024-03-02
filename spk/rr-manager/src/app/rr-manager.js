@@ -134,7 +134,10 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 handler: function () {
                     var form = myFormPanel.getForm();
                     var fileObject = form.el.dom[1].files[0];
-                    if (!form.isValid()) return;
+                    if (!form.isValid()){
+                        that.showMsg('error','Please select the update/updateAll file before start uploading.');
+                        return;
+                    }
                     that.getEl().mask(_T("common", "loading"), "x-mask-loading");
                     that.onUploadFile(fileObject, that);
                 }

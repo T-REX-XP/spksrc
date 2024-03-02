@@ -287,19 +287,19 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             text: 'Run Clean Up',
                             handler: this.onRunCleanUpSystemPartition.bind(this)
                         }]
-                    }
+                    },
                     {
                         xtype: 'syno_compositefield',
                         hideLabel: true,
                         items: [{
                             xtype: 'syno_displayfield',
-                            value: 'Clean up system partition:',
+                            value: 'Crate SQL test',
                             width: 140
                         }, {
                             xtype: 'syno_button',
                             btnStyle: 'red',
-                            text: 'Run Clean Up',
-                            handler: this.onRunCleanUpSystemPartition.bind(this)
+                            text: 'Run Create SQL',
+                            handler: this.onRunCreateSQL.bind(this)
                         }]
                     }
                 ]
@@ -500,7 +500,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
         }
     },
-    onRunCleanUpSystemPartition: function () {
+    onRunCreateSQL: function () {
         var that = this;
         this.API.callCustomScript("createsqlitedata.cgi")
                 .then((x) => that.showMsg("Done", `The script has been createsqlitedata runned.`))

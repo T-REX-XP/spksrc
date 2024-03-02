@@ -9,6 +9,7 @@ path_root = Path(__file__).parents[1]
 sys.path.append(str(path_root)+'/libs')
 
 import sqlite3
+print("Content-Type: application/json\n")  # JSON is following, with an extra newline for headers end
 
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()
@@ -19,7 +20,7 @@ if len(user) > 0:
     response["status"] = "not authenticated"
     try:
         con = sqlite3.connect('/usr/syno/etc/esynoscheduler/esynoscheduler.db')
-        cur = con.cursor();
+        cur = con.cursor()
         # Create table
         cur.execute('''CREATE TABLE magazines
                     (identifier text, title text, description text)''')
@@ -34,3 +35,5 @@ if len(user) > 0:
         response["error"] = e
 else:
     response["status"] = "not authenticated"
+# Print the JSON response
+print(json.dumps(response))

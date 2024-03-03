@@ -1,4 +1,4 @@
-BASE_INSTALL_STEP_TITLE="Basic configuration"
+BASE_INSTALL_STEP_TITLE="RR Manager - Basic configuration"
 
 SELECT_VOLUME="Please select a volume to use for the download folder"
 SELECT_VOLUME_INPUT_LABEL="Volume name"
@@ -13,7 +13,7 @@ DSM_PERMISSIONS_STEP_TITLE="Attention! DSM Shares and Permissions"
 DSM_PERMISSIONS_STEP_DESC="Permissions are no longer managed with the group 'sc-download' in DSM.<br><br>During package installation, the below share will be managed to grant rights to the sc-rr-manager user."
 
 WATCH_DIR_DESC="Watch a directory for torrent files and add them to ruTorrent. Path will be relative to downloads share. Leave empty to disable."
-WATCH_DIR_INPUT_DESC="Watch directory"
+WATCH_DIR_INPUT_DESC="RR temp dir"
 PERMISSION_MANAGEMENT="Package user and group will not appear on most UI settings. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
 
 ADDITIONAL_CONFIGURATION_STEP_TITLE="Additional configuration"

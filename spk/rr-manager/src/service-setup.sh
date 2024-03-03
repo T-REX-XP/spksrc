@@ -20,6 +20,7 @@ service_postinst ()
     echo "Populate config.txt"
     sed -i -e "s|@this_is_upload_realpath@|${wizard_download_dir}|g" \
            -e "s|@this_is_sharename@|${wizard_download_share}|g" \
+           -e "s|@this_is_rr_tpm_dir@|${wizard_watch_dir}|g" \
     "${SYNOPKG_PKGDEST}/app/config.txt"
 
 }

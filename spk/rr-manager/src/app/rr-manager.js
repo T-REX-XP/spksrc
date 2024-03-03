@@ -563,13 +563,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         });
         window.open();
     },
-    rrUpdateFileName: "update.zip",
-    rrTmpFolder: "tmp_rr_update",
     updateFileRealPath: function () {
-        return `${this.downloadFolderRealPath}/${this.rrTmpFolder}/${this.rrUpdateFileName}`;
-    },
-    uploadFilePatch: function () {
-        return `/downloads/${this.rrTmpFolder}`;
+        return `${this?.rrManagerConfig?.RR_TMP_DIR}/${this.opts.params.filename}`;
     },
     onRunRrUpdateManuallyClick: function () {
         that = this;
@@ -607,15 +602,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 runUpdate);
         }).catch(error => {
             that.showMsg('title', `Error. ${error}`);
-        });
-    },
-    // Call Python CGI on click
-    onGetConfigClick: function () {
-        that = this;
-        this.API.callCustomScript('getConfig.cgi').then((responseText) => {
-            var configName = 'rrConfig';
-            that[configName] = responseText;
-            that.populateSystemInfoPanel(that[configName]);
         });
     },
     populateSystemInfoPanel: function (config) {
@@ -847,24 +833,35 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         var that = this;
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
-        this.onGetConfigClick();
-        this.API.getSharesList().then(x => {
-            var that = this;
-            var sharesList = x.data.shares;
-            var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == '/downloads');
-            if (!downloadsShareMetadata) {
-                var msg = '❗❗❗Attention! The "downloads" share not found. Please create the share and restart the app.';
-                var tabs = Ext.getCmp('tabsControl');
-                tabs.getEl().mask(msg, "x-mask-loading");
-                this.showMsg('error', msg);
-                return;
-            }
-            that.downloadFolderRealPath = downloadsShareMetadata?.additional.real_path;
-        });
-        that.API.getSytemInfo().then((x) => {
-            that['synoInfo'] = x.data;
-            //lbRrVersion
-            Ext.getCmp('lbSystemInfo').setValue(`Model: ${x.data.model}, RAM: ${x.data.ram} Gb, DSM version: ${x.data.version_string} `);
+
+        this.API.callCustomScript('getConfig.cgi').then((responseText) => {
+            var configName = 'rrConfig';
+            that[configName] = responseText;
+            that.populateSystemInfoPanel(that[configName]);
+            //populate rr config path
+            that['rrManagerConfig'] = that[configName]['rr_manager_config'];
+            that['opts']['params']['path'] = `/${that['rrManagerConfig']['SHARE_NAME']}/${that['rrManagerConfig']['RR_TMP_DIR']}`;
+
+            this.API.getSharesList().then(x => {
+                // var that = this;
+                var shareName = `/${that['rrManagerConfig']['SHARE_NAME']}`;
+                console.log()
+                var sharesList = x.data.shares;
+                var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == shareName);
+                if (!downloadsShareMetadata) {
+                    var msg = `❗❗❗Attention! The "${that['rrManagerConfig']['SHARE_NAME']}" share not found. Please create the share and restart the app.`;
+                    var tabs = Ext.getCmp('tabsControl');
+                    tabs.getEl().mask(msg, "x-mask-loading");
+                    this.showMsg('error', msg);
+                    return;
+                }
+                //TODO: populate from the config.txt
+                that.downloadFolderRealPath = downloadsShareMetadata?.additional?.real_path;
+            });
+            that.API.getSytemInfo().then((x) => {
+                that['synoInfo'] = x.data;
+                Ext.getCmp('lbSystemInfo').setValue(`🖥️ Model: ${x?.data?.model}, RAM: ${x?.data?.ram} Gb, DSM version: ${x?.data?.version_string} `);
+            });
         });
     },
 
@@ -997,7 +994,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         },
         //TODO: remove hard coding
         params: {
-            path: "/downloads/tmp_rr_update",
+            // populating from the config in onOpen
+            path: '',
             filename: "update.zip",
             overwrite: true
         }

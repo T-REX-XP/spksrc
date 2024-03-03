@@ -28,6 +28,21 @@ def read_user_config():
         return f"Error reading user-config.yml: {e}"
     except e:
         return "{}"
+    
+def read_rrmanager_config(file_path):
+    try:
+        config = {}
+        with open(file_path, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    key, value = line.split('=')
+                    config[key.strip()] = value.strip()
+        return config
+    except IOError as e:
+        return f"Error reading user-config.yml: {e}"
+    except e:
+        return "{}"
 # Authenticate the user
 f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi', 'r')
 user = f.read().strip()
@@ -41,6 +56,7 @@ if len(user) > 0:
     # Read and add rr_version to the response
     response["rr_version"] = read_rr_version()
     response["user_config"] = read_user_config()
+    response["rr_manager_config"] = read_rrmanager_config('/var/packages/rr-manager/target/app/config.txt')
 else:
     response["status"] = "not authenticated"
 

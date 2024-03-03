@@ -1,4 +1,4 @@
-BASE_INSTALL_STEP_TITLE="Configuration de base"
+BASE_INSTALL_STEP_TITLE="RR Manager - Configuration de base"
 
 SELECT_VOLUME="Sélectionner le volume à utiliser pour le répertoire de téléchargements"
 SELECT_VOLUME_INPUT_LABEL="Nom du volume"
@@ -13,7 +13,7 @@ DSM_PERMISSIONS_STEP_TITLE="Attention! Permissions DSM et répertoires partagés
 DSM_PERMISSIONS_STEP_DESC="Les permissions de cette application de téléchargement ne sont plus gérées par le groupe <b>'sc-download'</b> dans DSM.<br />L'utilisateur spécifique à l'application se verra attribuer les droits au répertoire partagé ci-dessous."
 
 WATCH_DIR_DESC="Surveille les torrents dans un répertoire et les ajoute à ruTorrent automatiquement. Relatif au répertoire partagé. Laisser vide pour désactiver"
-WATCH_DIR_INPUT_DESC="Répertoire surveillé"
+WATCH_DIR_INPUT_DESC="RR temp dir"
 PERMISSION_MANAGEMENT="L'utilisateur et le group du package n'apparaîtront pas sur la plupart des UI réglages. Veuillez vous référrer à <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
 
 ADDITIONAL_CONFIGURATION_STEP_TITLE="Configuration additionnelle"

@@ -24,7 +24,8 @@ Create folowing tasks manually that must be runned behalf of `root`:
 
 - RunRrUpdate:
 ```bash
-/usr/bin/rr-update.sh updateRR /volume1/downloads/tmp_rr_update/update.zip /tmp/rr_update_progress
+. /var/packages/rr-manager/target/app/config.txt
+/usr/bin/rr-update.sh updateRR "$UPLOAD_DIR_PATH$RR_TMP_DIR"/update.zip /tmp/rr_update_progress
 ```
 
 - SetRootPrivsToRrManager:

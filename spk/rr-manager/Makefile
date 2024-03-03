@@ -2,7 +2,7 @@ SPK_NAME = rr-manager
 SPK_VERS = 1.0
 SPK_REV = 04
 SPK_ICON = src/rr-manager.png
-WIZARDS_DIR = WIZARD_UIFILES
+# WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
@@ -41,7 +41,7 @@ WIZARDS = install_uifile upgrade_uifile
 SUPPORTED_LANGUAGES = fre
 
 wizards: generated-wizards
-include ../../mk/spksrc.spk.mk
+# include ../../mk/spksrc.spk.mk
 
 .PHONY: generated-wizards
 generated-wizards:

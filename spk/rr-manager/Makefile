@@ -15,7 +15,7 @@ MAINTAINER = T-REX-XP
 
 DESCRIPTION = RR Manager is a Redpill Recovery DSM application aimed to provide the ability to configure/update RR without booting to RR recovery. This package is for experienced users.
 STARTABLE = no
-DISPLAY_NAME = RRM anager
+DISPLAY_NAME = RR Manager
 
 HOMEPAGE = https://github.com/T-REX-XP/RRManager
 

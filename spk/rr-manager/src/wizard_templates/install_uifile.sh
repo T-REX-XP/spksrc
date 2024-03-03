@@ -89,7 +89,6 @@ base_install_step() {
         {
             "type": "textfield",
             "desc": "${WATCH_DIR_DESC}",
-            "defaultValue": "tmp_rr_update"
             "subitems": [
                 {
                     "key": "wizard_watch_dir",

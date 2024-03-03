@@ -1,0 +1,2 @@
+UPLOAD_DIR_PATH=@this_is_upload_realpath@
+SHARE_NAME=@this_is_sharename@

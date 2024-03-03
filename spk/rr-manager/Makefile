@@ -72,6 +72,7 @@ rr-manager_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/
 	install -m 755 -d $(STAGING_DIR)/app/libs/
 	install -m 755 src/app/getConfig.cgi $(STAGING_DIR)/app/getConfig.cgi
+	install -m 755 src/app/config.txt $(STAGING_DIR)/app/config.txt
 	install -m 755 src/app/getAddons.cgi $(STAGING_DIR)/app/getAddons.cgi
 	install -m 755 src/app/getModules.cgi $(STAGING_DIR)/app/getModules.cgi
 	install -m 755 src/app/readUpdateFile.cgi $(STAGING_DIR)/app/readUpdateFile.cgi

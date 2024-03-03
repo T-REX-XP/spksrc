@@ -3,7 +3,7 @@
     "services": [
       {
         "service": "rr-manager",
-        "display_name": "RRManager",
+        "display_name": "RR Manager",
         "type": "static",
         "root": "rr-manager",
         "backend": 2,

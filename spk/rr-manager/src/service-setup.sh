@@ -1,5 +1,5 @@
 PYTHON_DIR="/var/packages/python311/target/bin"
-PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 
 service_postinst ()
 {
@@ -15,4 +15,11 @@ service_postinst ()
     echo ${separator}
     echo "Install packages to the app/libs folder"
     ${SYNOPKG_PKGDEST}/env/bin/pip install --target ${SYNOPKG_PKGDEST}/app/libs/ -r ${SYNOPKG_PKGDEST}/share/wheelhouse/requirements.txt
+
+    echo ${separator}
+    echo "Populate config.txt"
+    sed -i -e "s|@this_is_upload_realpath@|${wizard_download_dir}|g" \
+           -e "s|@this_is_sharename@|${wizard_download_share}|g" \
+    "${SYNOPKG_PKGDEST}/app/config.txt"
+
 }

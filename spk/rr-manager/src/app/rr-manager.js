@@ -202,18 +202,18 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             items: [
                                 {
                                     xtype: 'syno_displayfield',
-                                    value: 'RR v.',
+                                    value: '💊RR v.',
                                     cls: 'lb-title',
-                                    width: 40,
+                                    width: 60,
                                 }, {
                                     xtype: 'syno_displayfield',
-                                    width: 50,
+                                    width: 55,
                                     id: 'lbRrVersion'
                                 }, {
                                     xtype: 'syno_displayfield',
-                                    width: 100,
+                                    width: 120,
                                     cls: 'lb-title',
-                                    value: 'System Info:'
+                                    value: '🖥️System Info:'
                                 }, {
                                     xtype: 'syno_displayfield',
                                     width: 500,
@@ -516,7 +516,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onRunCleanUpSystemPartition: function () {
         var that = this;
         this.showPrompt("Would you like to run clean up sustem partition script?", x => {
-            this.API.callCustomScript("clean_system_disk.cgi")
+            this.API.callCustomScript("../../clean_system_disk.cgi")
                 .then((x) => that.showMsg("Done", `The script has been successfully runned.`))
                 .catch((e) => that.showMsg("Error", `Unable to run cleanup script. ${e}`));
         });
@@ -564,11 +564,16 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         window.open();
     },
     updateFileRealPath: function () {
-        return `${this?.rrManagerConfig?.RR_TMP_DIR}/${this.opts.params.filename}`;
+        return `${this?.rrManagerConfig?.UPLOAD_DIR_PATH}/${this?.rrManagerConfig?.RR_TMP_DIR}/${this.opts.params.filename}`;
     },
     onRunRrUpdateManuallyClick: function () {
         that = this;
         this.API.getUpdateFileInfo(that.updateFileRealPath()).then((responseText) => {
+            if(!responseText.success) {
+                that.showMsg('title', `Unable to update RR: ${responseText?.error}. \n Please upload the file and try againe.`);
+                return;
+            }
+
             var configName = 'rrUpdateFileVersion';
             that[configName] = responseText;
             let currentRrVersion = that["rrConfig"]?.rr_version;
@@ -845,7 +850,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             this.API.getSharesList().then(x => {
                 // var that = this;
                 var shareName = `/${that['rrManagerConfig']['SHARE_NAME']}`;
-                console.log()
                 var sharesList = x.data.shares;
                 var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == shareName);
                 if (!downloadsShareMetadata) {
@@ -860,7 +864,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             });
             that.API.getSytemInfo().then((x) => {
                 that['synoInfo'] = x.data;
-                Ext.getCmp('lbSystemInfo').setValue(`🖥️ Model: ${x?.data?.model}, RAM: ${x?.data?.ram} Gb, DSM version: ${x?.data?.version_string} `);
+                Ext.getCmp('lbSystemInfo').setValue(`Model: ${x?.data?.model}, RAM: ${x?.data?.ram} Gb, DSM version: ${x?.data?.version_string} `);
             });
         });
     },
@@ -940,8 +944,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onUploadFile: function (e, that) {
         //create rr tmp folder
         SYNO.API.currentManager.requestAPI("SYNO.FileStation.CreateFolder", "create", "2", {
-            folder_path: "/downloads",
-            name: that.rrTmpFolder,
+            folder_path: `/${that['rrManagerConfig']['SHARE_NAME']}`,
+            name: that['rrManagerConfig']['RR_TMP_DIR'],
             force_parent: false
         });
         //rename file to update.zip

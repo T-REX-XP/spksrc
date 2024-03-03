@@ -208,7 +208,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                                 }, {
                                     xtype: 'syno_displayfield',
                                     width: 55,
-                                    id: 'lbRrVersion'
+                                    id: 'lbRrVersion',
+                                    title: '...'
                                 }, {
                                     xtype: 'syno_displayfield',
                                     width: 120,
@@ -219,13 +220,27 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                                     width: 500,
                                     id: 'lbSystemInfo',
                                     value: 'Loading...'
-                                }, {
-                                    xtype: 'syno_displayfield',
-                                    width: 2,
-                                    id: 'spacer',
-                                    value: ' '
-                                }]
+                                }
+                            ]
                         },
+                        {
+                            xtype: 'syno_compositefield',
+                            hideLabel: true,
+                            items: [
+                                {
+                                    xtype: 'syno_displayfield',
+                                    width: 140,
+                                    cls: 'lb-title',
+                                    value: '🛡️RR Manager v.:'
+                                },
+                                {
+                                    xtype: 'syno_displayfield',
+                                    width: 55,
+                                    id: 'lbRrManagerVersion',
+                                    value: '...'
+                                },
+                            ]
+                        }
                     ],
                     deferredRender: true
                 },
@@ -469,6 +484,42 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 });
             });
         },
+        getPackagesList: function () {
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: this._baseUrl,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': '*/*'
+                    },
+                    params: {
+                        api: 'SYNO.Core.Package',
+                        method: 'list',
+                        version: 2,
+                        additional: ["description", "description_enu", "dependent_packages", "beta", "distributor", "distributor_url", "maintainer", "maintainer_url", "dsm_apps", "dsm_app_page", "dsm_app_launch_name", "report_beta_url", "support_center", "startable", "installed_info", "support_url", "is_uninstall_pages", "install_type", "autoupdate", "silent_upgrade", "installing_progress", "ctl_uninstall", "updated_at", "status", "url", "available_operation", "install_type"],
+                        ignore_hidden: false,
+                    },
+                    success: function (response) {
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+                    },
+                    failure: function (response) {
+                        if (typeof result?.responseText === 'string' && result?.responseText) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + response.status);
+                        }
+                    }
+                });
+            });
+        },
+
         rebootSystem: function () {
             return new Promise((resolve, reject) => {
                 Ext.Ajax.request({
@@ -867,6 +918,10 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 that['synoInfo'] = x.data;
                 Ext.getCmp('lbSystemInfo').setValue(`Model: ${x?.data?.model}, RAM: ${x?.data?.ram} Gb, DSM version: ${x?.data?.version_string} `);
             });
+        });
+        that.API.getPackagesList().then((response) => {
+            var rrManagerPackage = response.data.packages.find(p => p.id == 'rr-manager');
+            Ext.getCmp('lbRrManagerVersion')?.setValue(`${rrManagerPackage?.version}`);
         });
     },
 

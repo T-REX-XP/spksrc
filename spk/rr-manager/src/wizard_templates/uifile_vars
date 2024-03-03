@@ -10,7 +10,7 @@ DOWNLOAD_SHARED_FOLDER_LOCATION="Download location"
 IF_SPECIFIED_SHARE_DOES_NOT_EXIST="If the specified share does not exist, it will be created. You can use an existing share by specifying the name of the folder."
 
 DSM_PERMISSIONS_STEP_TITLE="Attention! DSM Shares and Permissions"
-DSM_PERMISSIONS_STEP_DESC="Permissions are no longer managed with the group 'sc-download' in DSM.<br><br>During package installation, the below share will be managed to grant rights to the sc-rutorrent user."
+DSM_PERMISSIONS_STEP_DESC="Permissions are no longer managed with the group 'sc-download' in DSM.<br><br>During package installation, the below share will be managed to grant rights to the sc-rr-manager user."
 
 WATCH_DIR_DESC="Watch a directory for torrent files and add them to ruTorrent. Path will be relative to downloads share. Leave empty to disable."
 WATCH_DIR_INPUT_DESC="Watch directory"

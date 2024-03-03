@@ -28,5 +28,14 @@
         "group": "http"
       }
     ]
-  }
+  },
+	"data-share": {
+		"shares": [
+			{
+				"name": "{{wizard_download_share}}", 
+				"permission":{"rw":["sc-rr-manager"]},
+				"once": true
+			}
+		]
+	}
 }

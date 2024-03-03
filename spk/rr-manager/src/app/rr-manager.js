@@ -329,7 +329,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     if (callback) callback(response.responseText);
                 },
                 failure: function (response) {
-                    that.showMsg('Erro', 'Request Failed to mount loader disk.');
+                    that.showMsg('Error', 'Request Failed');
+                    console.error(response);
                 }
             });
         },
@@ -569,7 +570,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     onRunRrUpdateManuallyClick: function () {
         that = this;
         this.API.getUpdateFileInfo(that.updateFileRealPath()).then((responseText) => {
-            if(!responseText.success) {
+            if (!responseText.success) {
                 that.showMsg('title', `Unable to update RR: ${responseText?.error}. \n Please upload the file and try againe.`);
                 return;
             }

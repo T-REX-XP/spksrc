@@ -33,6 +33,34 @@ SPK_COMMANDS = env/bin/beet
 POST_STRIP_TARGET = rr-manager_extra_install
 
 include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.directories.mk
+SERVICE_WIZARD_SHARE = wizard_download_dir
+DSM_UI_CONFIG = src/app/config
+WIZARDS_DIR = $(WORK_DIR)/generated-wizards
+WIZARDS = install_uifile upgrade_uifile
+SUPPORTED_LANGUAGES = fre
+
+wizards: generated-wizards
+include ../../mk/spksrc.spk.mk
+
+.PHONY: generated-wizards
+generated-wizards:
+	@mkdir -p $(WIZARDS_DIR)
+	@for template in $(WIZARDS); do \
+		for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
+			{\
+			  	echo "#!/bin/sh";\
+				echo "";\
+				cat src/wizard_templates/uifile_vars$${suffix} | sed -e 's/\\/\\\\/g' -e 's/\"/\\\"/g' -e 's/^\([^=]*\)=\\"\(.*\)\\"$$/\1="\2"/g';\
+				echo "";\
+				cat "$(SPKSRC_MK)spksrc.service.installer.functions";\
+				echo "";\
+				cat src/wizard_templates/shared_uifile_setup.sh;\
+				echo "";\
+				cat src/wizard_templates/$${template}.sh;\
+			}>$(WIZARDS_DIR)/$${template}$${suffix}.sh;\
+		done;\
+	done
 
 .PHONY: rr-manager_extra_install
 rr-manager_extra_install:

@@ -32,7 +32,8 @@ SPK_COMMANDS = env/bin/beet
 
 POST_STRIP_TARGET = rr-manager_extra_install
 
-include ../../mk/spksrc.spk.mk
+
+include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 SERVICE_WIZARD_SHARE = wizard_download_dir
 DSM_UI_CONFIG = src/app/config
@@ -41,7 +42,7 @@ WIZARDS = install_uifile upgrade_uifile
 SUPPORTED_LANGUAGES = fre
 
 wizards: generated-wizards
-# include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.spk.mk
 
 .PHONY: generated-wizards
 generated-wizards:

@@ -584,7 +584,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 //show the spinner
                 that.getEl().mask(_T("common", "loading"), "x-mask-loading");
                 that.API.runTask('RunRrUpdate');
-                var maxCountOfRefreshUpdateStatus = 50;
+                var maxCountOfRefreshUpdateStatus = 250;
                 var countUpdatesStatusAttemp = 0;
 
                 var updateStatusInterval = setInterval(async function () {
@@ -601,7 +601,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         clearInterval(updateStatusInterval);
                         that.showMsg('title', `The RR has been successfully updated. Please restart the PC.`);
                     }
-                }, 1000);
+                }, 1500);
             }
             that.showPrompt(
                 `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,

@@ -75,6 +75,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             items: [
                 {
                     xtype: 'syno_tabpanel',
+                    name: 'tabsControl',
+                    id: 'tabsControl',
                     activeTab: 0,
                     plain: true,
                     items: this.tabs,
@@ -120,14 +122,14 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         var myFormPanel = new Ext.form.FormPanel({
             title: 'Please select the update file:',
             url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
-            height:'80%',
+            height: '80%',
             fileUpload: true,
             width: '100%',
             border: !1,
-            layout : {
-                type :'vbox',
-                align: 'center'               
-             },
+            layout: {
+                type: 'vbox',
+                align: 'center'
+            },
             bodyPadding: 10,
             items: [{
                 xtype: 'syno_filebutton',
@@ -703,7 +705,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     // Create JSON Store grid calling python SQL API  
     createAddonsGrid: function () {
         var that = this;
-        var currentLngCode = this._getLng(SYNO.SDS.UserSettings.data.Personal.lang);
+        var currentLngCode = this._getLng(SYNO?.SDS?.Session?.lang || "enu");
 
         var gridStore = new SYNO.API.JsonStore({
             autoDestroy: true,
@@ -847,10 +849,14 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         this.onRunTaskMountLoaderDiskClick();
         this.onGetConfigClick();
         this.API.getSharesList().then(x => {
+            var that = this;
             var sharesList = x.data.shares;
             var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == '/downloads');
             if (!downloadsShareMetadata) {
-                this.showMsg('error', 'The "downloads" share not found. Please create the share and restart the app.');
+                var msg = '❗❗❗Attention! The "downloads" share not found. Please create the share and restart the app.';
+                var tabs = Ext.getCmp('tabsControl');
+                tabs.getEl().mask(msg, "x-mask-loading");
+                this.showMsg('error', msg);
                 return;
             }
             that.downloadFolderRealPath = downloadsShareMetadata?.additional.real_path;

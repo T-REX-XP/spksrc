@@ -1,6 +1,6 @@
 SPK_NAME = rr-manager
 SPK_VERS = 1.0
-SPK_REV = 09
+SPK_REV = 10
 SPK_ICON = src/rr-manager.png
 # WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app

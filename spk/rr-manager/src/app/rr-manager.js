@@ -17,7 +17,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     tabs: null,
     constructor: function (config) {
         this.appInstance = config.appInstance;
-
+        Ext.util.CSS.createStyleSheet('.my-icon { background-image: url("webman/3rdparty/StorageManager/images/default/1x/overview_status.png") !important; }');
+        Ext.util.CSS.createStyleSheet('.lb-title { font-weight: bold; }');
+        Ext.util.CSS.createStyleSheet('.tab { background-color: #f4f8fa; }');
+        Ext.util.CSS.createStyleSheet('.mainWindow { background-color: white }');
+        Ext.util.CSS.createStyleSheet('.panel-with-border { padding: 10px; margin: 10px; border-radius: 2px; box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5); }');
         this.tabs = (function () {
             var allTabs = [];
 
@@ -25,6 +29,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             allTabs.push({
                 title: 'General',
                 id: "tabGeneral",
+                cls: 'tab',
+                height: '100%',
                 items: [
                     //this.createSystemInfoPannel(),
                     this.createGeneralSection(),
@@ -37,6 +43,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 title: 'Addons',
                 layout: 'fit',
                 id: "tabAddons",
+                cls: 'tab',
                 items: [
                     // this.createSynoStore(),
                     this.createAddonsStore()
@@ -47,6 +54,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 title: 'Update',
                 layout: 'fit',
                 id: "tabUpdate",
+                cls: 'tab',
                 name: "tabUpdate",
                 items: [
                     {
@@ -63,8 +71,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             return allTabs;
         }).call(this);
 
-        Ext.util.CSS.createStyleSheet('.my-icon { background-image: url("webman/3rdparty/StorageManager/images/default/1x/overview_status.png") !important; }');
-        Ext.util.CSS.createStyleSheet('.lb-title { font-weight: bold; }');
 
         config = Ext.apply({
             resizable: true,
@@ -72,6 +78,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             minimizable: true,
             width: 640,
             height: 640,
+            cls: 'mainWindow',
             items: [
                 {
                     xtype: 'syno_tabpanel',
@@ -90,13 +97,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     saveChanges: function (e) {
         //Rewrite rr config with new addons
         var newAddons = {};
-        that['rrInstalledAddons']?.forEach(addonName => {
+        this['rrInstalledAddons']?.forEach(addonName => {
             newAddons[addonName] = ''
         });
 
-        that['rrConfigNew'] = that['rrConfig']['user_config'];
-        that['rrConfigNew']['addons'] = newAddons;
-        this.handleFileUpload(that['rrConfigNew']);
+        this['rrConfigNew'] = this['rrConfig']['user_config'];
+        this['rrConfigNew']['addons'] = newAddons;
+        this.handleFileUpload(this['rrConfigNew']);
     },
     handleFileUpload: function (jsonData) {
         let url = `${this.API._prefix}uploadConfigFile.cgi`;
@@ -120,11 +127,12 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createUploadPannel: function () {
         var that = this;
         var myFormPanel = new Ext.form.FormPanel({
+            cls: 'panel-with-border',
             title: 'Please select the update file:',
             url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
             height: '80%',
             fileUpload: true,
-            width: '100%',
+            width: '98%',
             border: !1,
             layout: {
                 type: 'vbox',
@@ -176,7 +184,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             items: [
                 {
                     xtype: 'syno_panel',
-                    style: 'padding: 10px; margin: 10px; border-radius: 2px; box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5);',
+                    cls: 'panel-with-border',
                     activeTab: 0,
                     plain: true,
                     items: [
@@ -251,7 +259,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createActionsSection: function () {
         return new SYNO.ux.FieldSet({
             title: 'RR Loader Actions',
-            collapsible: true,
+            cls: 'panel-with-border',
+            collapsible: false,
             items:
                 [
                     {
@@ -704,6 +713,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             // title: 'Addons',
             collapsible: false,
             autoHeight: true,
+            cls: 'panel-with-border',
             items: [{
                 xtype: 'syno_compositefield',
                 hideLabel: true,

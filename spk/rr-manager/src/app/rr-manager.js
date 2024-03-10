@@ -755,9 +755,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     }
                 }, 1500);
             }
-            that.showPrompt(
-                `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,
-                "Confirm update", runUpdate);
+            that.showPrompt(formatString(_V('ui', 'update_rr_confirmation'), currentRrVersion, updateRrVersion),
+                _V('ui','update_rr_confirmation_title'), runUpdate);
         }).catch(error => {
             that.showMsg('title', `Error. ${error}`);
         });
@@ -891,7 +890,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         {
                             xtype: 'syno_button',
                             btnStyle: 'green',
-                            text: _V('ui','save_addons_changes'),
+                            text: _V('ui', 'save_addons_changes'),
                             handler: this.saveChanges.bind(this)
                         },
 
@@ -1158,7 +1157,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             }
                         }
                         // After all tasks have been created, you might want to notify the user.
-                        that.showMsg('title', _V('ui','tasks_created_msg'));
+                        that.showMsg('title', _V('ui', 'tasks_created_msg'));
                     });
             }
         } catch (error) {

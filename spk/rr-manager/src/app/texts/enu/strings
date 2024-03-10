@@ -14,7 +14,8 @@ alt_confirm = "Confirm"
 update_rr_progress_msg = "Update RR in progress: {0}. Status: {1}."
 update_rr_completed = "The RR has been successfully updated. Please restart the PC."
 update_rr_error_msg = "Unable to update RR. Status code: {0}, Reason: {1}"
-
+update_rr_confirmation = "Curent RR version: {0}. Update file version: {1}"
+update_rr_confirmation_title = "Confirm update"
 confirm_system_clean_up_msg = "Would you like to run clean up sustem partition script?"
 confirm_system_clean_up_title = "Confirm system cleanup"
 

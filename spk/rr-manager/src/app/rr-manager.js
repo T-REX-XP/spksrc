@@ -10,6 +10,11 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppInstance', {
     }
 });
 
+// Translator
+_V = function (category, element) {
+    return _TT("SynoCommunity.SimplePermissionManager.AppInstance", category, element)
+}
+
 // Window definition
 Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     extend: 'SYNO.SDS.AppWindow',
@@ -528,7 +533,43 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 });
             });
         },
-
+        getTaskList: function () {
+            return new Promise((resolve, reject) => {
+                Ext.Ajax.request({
+                    url: this._baseUrl,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': '*/*'
+                    },
+                    params: {
+                        api: 'SYNO.Core.TaskScheduler',
+                        method: 'list',
+                        version: 3,
+                        sort_by: "next_trigger_time",
+                        sort_direction: "ASC",
+                        offset: 0,
+                        limit: 50
+                    },
+                    success: function (response) {
+                        if (typeof response?.responseText === 'string') {
+                            resolve(Ext.decode(response?.responseText));
+                        } else {
+                            resolve(response?.responseText);
+                        }
+                    },
+                    failure: function (response) {
+                        if (typeof result?.responseText === 'string' && result?.responseText) {
+                            var response = Ext.decode(result?.responseText);
+                            reject(response?.error);
+                        }
+                        else {
+                            reject('Failed with status: ' + response.status);
+                        }
+                    }
+                });
+            });
+        },
         rebootSystem: function () {
             return new Promise((resolve, reject) => {
                 Ext.Ajax.request({
@@ -566,7 +607,111 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 });
             });
 
-        }
+        },
+        createRunRrUpdateTask: function (token, callback) {
+            params = {
+                task_name: "RunRrUpdate",
+                owner: { 0: "root" },
+                event: "bootup",
+                enable: false,
+                depend_on_task: "",
+                notify_enable: false,
+                notify_mail: "",
+                notify_if_error: false,
+                operation_type: "script",
+                operation:
+                    ". /var/packages/rr-manager/target/app/config.txt\n/usr/bin/rr-update.sh updateRR \"$UPLOAD_DIR_PATH$RR_TMP_DIR\"/update.zip /tmp/rr_update_progress",
+            };
+
+            if (token != "") {
+                params.SynoConfirmPWToken = token
+            }
+
+            args = {
+                method: "create",
+                version: 1,
+                params: params,
+                callback: function (success, message) {
+                    if (!success) {
+                        console.log("error create EventScheduler task");
+                        return;
+                    }
+
+                    if (token != "" && callback) {
+                        callback();
+                        // this.runSchedulerTask();
+                    } else {
+                        this.sendRunSchedulerTaskWebAPI("");
+                    }
+                },
+                scope: this,
+            }
+
+            if (token != "") {
+                args.api = "SYNO.Core.EventScheduler.Root"
+            } else {
+                args.api = "SYNO.Core.EventScheduler"
+            }
+
+            this.sendWebAPI(args);
+        },
+        createRunRrUpdateTask: function (token, callback) {
+            params = {
+                task_name: "RunRrUpdate",
+                owner: { 0: "root" },
+                event: "bootup",
+                enable: false,
+                depend_on_task: "",
+                notify_enable: false,
+                notify_mail: "",
+                notify_if_error: false,
+                operation_type: "script",
+                operation:
+                    ". /var/packages/rr-manager/target/app/config.txt\n/usr/bin/rr-update.sh updateRR \"$UPLOAD_DIR_PATH$RR_TMP_DIR\"/update.zip /tmp/rr_update_progress",
+            };
+
+            if (token != "") {
+                params.SynoConfirmPWToken = token
+            }
+
+            args = {
+                method: "create",
+                version: 1,
+                params: params,
+                callback: function (success, message) {
+                    if (!success) {
+                        console.log("error create EventScheduler task");
+                        return;
+                    }
+
+                    if (token != "" && callback) {
+                        callback();
+                        // this.runSchedulerTask();
+                    } else {
+                        this.sendRunSchedulerTaskWebAPI("");
+                    }
+                },
+                scope: this,
+            }
+
+            if (token != "") {
+                args.api = "SYNO.Core.EventScheduler.Root"
+            } else {
+                args.api = "SYNO.Core.EventScheduler"
+            }
+
+            this.sendWebAPI(args);
+        },
+        createAndRunSchedulerTask: function () {
+            this.fetchSynoConfirmPWToken(
+                this.API.createRunRrUpdateTask.bind(this)
+            );
+        },
+        createAndRunSchedulerTaskSetRootPrivilegesForRrManager: function () {
+            this.fetchSynoConfirmPWToken(
+                this.API.createRunSetPriviledgeForRRTask.bind(this)
+            );
+        },
     },
     onRunCreateSQL: function () {
         var that = this;
@@ -896,8 +1041,99 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         };
         return new SYNO.ux.GridPanel(c);
     },
+    showPasswordConfirmDialog: function (callback) {
+        var window = new SYNO.SDS.ModalWindow({
+            id: "confirm_password_dialog",
+            title: _T("common", "enter_password_to_continue"),
+            width: 500,
+            height: 200,
+            resizable: !1,
+            layout: "fit",
+            buttons: [
+                {
+                    xtype: "syno_button",
+                    text: _T("common", "alt_cancel"),
+                    scope: this,
+                    handler: function () {
+                        Ext.getCmp("confirm_password_dialog").close();
+                    },
+                },
+                {
+                    xtype: "syno_button",
+                    text: _T("common", "submit"),
+                    btnStyle: "blue",
+                    scope: this,
+                    handler: callback//this.API.createAndRunSchedulerTask.bind(this),
+                },
+            ],
+            items: [
+                {
+                    xtype: "syno_formpanel",
+                    id: "password_form_panel",
+                    bodyStyle: "padding: 0",
+                    items: [
+                        {
+                            xtype: "syno_displayfield",
+                            value: String.format(
+                                _T("common", "enter_user_password")
+                            ),
+                        },
+                        {
+                            xtype: "syno_textfield",
+                            fieldLabel: _T("common", "password"),
+                            textType: "password",
+                            id: "confirm_password",
+                        },
+                    ],
+                },
+            ],
+        });
+        window.open();
+    },
+    fetchSynoConfirmPWToken: function (callback) {
+        this.sendWebAPI({
+            api: "SYNO.Core.User.PasswordConfirm",
+            method: "auth",
+            version: 2,
+            params: {
+                password: Ext.getCmp("confirm_password").getValue(),
+            },
+            callback: function (success, response) {
+                if (!success) {
+                    window.alert("invalid admin password");
+                    return;
+                }
+
+                if (
+                    response.SynoConfirmPWToken === null ||
+                    (typeof response.SynoConfirmPWToken === "string" &&
+                        response.SynoConfirmPWToken.trim() === "")
+                ) {
+                    console.log("empty SynoConfirmPWToken");
+                    return;
+                }
+
+                callback(response.SynoConfirmPWToken);
+            },
+            scope: this,
+        });
+    },
     onOpen: function (a) {
         var that = this;
+        var requiredTasks = [
+
+            {
+                name: "RunRrUpdate", craeteTaskCallback: this.API.createAndRunSchedulerTask.bind(this,
+                    { callback: this.API.createAndRunSchedulerTask.bind(this) })
+            },
+            {
+                name: "SetRootPrivsToRrManager", craeteTaskCallback: this.API.createTaskRunRrUpdate.bind(this,
+                    { callback: this.API.createAndRunSchedulerTaskSetRootPrivilegesForRrManager.bind(this) })
+            }
+        ];
+        // { name: "SetRootPrivsToRrManager", craeteTaskCallback: this.API.createTaskRunRrUpdate.bind(this) }];
+        var tasksToCreate = [];
+
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
 
@@ -932,6 +1168,37 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         that.API.getPackagesList().then((response) => {
             var rrManagerPackage = response.data.packages.find(p => p.id == 'rr-manager');
             Ext.getCmp('lbRrManagerVersion')?.setValue(`${rrManagerPackage?.version}`);
+        });
+
+        //TODO: implement checking required tasks and if task doesn't exists, ask to create them
+        that.API.getTaskList().then((response) => {
+            var tasks = response.data.tasks;
+
+
+            requiredTasks?.forEach(task => {
+                var isTaskExisting = tasks.find(x => x.name == task.name) != null;
+                if (!isTaskExisting) {
+                    tasksToCreate.push(task.name);
+                    // console.log('Creating the task: '+task.name);
+                    // task?.craeteTaskCallback();
+                }
+            });
+            if (tasksToCreate?.length > 0) {
+                that.showPrompt(`The following tasks ${tasksToCreate.join(', ')} are missing in the system.
+                    It will require enter your password. \n Do you wan't to create them?`,
+                    function (a) {
+                        that.showPasswordConfirmDialog();
+                        // tasksToCreate.forEach(task2create => {
+                        //     var taskMetadata = requiredTasks?.find(x => x.name = task2create);
+                        //     if (taskMetadata && taskMetadata?.craeteTaskCallback) {
+                        //         taskMetadata?.craeteTaskCallback();
+                        //     }
+                        // });
+                        // that.showMsg('title', "The tasks has been succesfully created.\nPlease restart the RR Manager app.");
+                    });
+            }
+
+            console.log('task list: ', tasks);
         });
     },
 

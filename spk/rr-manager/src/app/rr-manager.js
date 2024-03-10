@@ -12,7 +12,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppInstance', {
 
 // Translator
 _V = function (category, element) {
-    return _TT("SynoCommunity.SimplePermissionManager.AppInstance", category, element)
+    return _TT("SYNOCOMMUNITY.RRManager.AppInstance", category, element)
+}
+
+formatString = function (str, ...args) {
+    return str.replace(/{(\d+)}/g, function (match, number) {
+        return typeof args[number] !== 'undefined' ? args[number] : match;
+    });
 }
 
 // Window definition
@@ -32,7 +38,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
             // Tab for CGI or API calls
             allTabs.push({
-                title: 'General',
+                title: _V("ui", "tab_general"),
                 id: "tabGeneral",
                 cls: 'tab',
                 height: '100%',
@@ -45,31 +51,13 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             });
 
             allTabs.push({
-                title: 'Addons',
+                title: _V("ui", "tab_addons"),
                 layout: 'fit',
                 id: "tabAddons",
                 cls: 'tab',
                 items: [
                     // this.createSynoStore(),
                     this.createAddonsStore()
-                ]
-            });
-
-            allTabs.push({
-                title: 'Update',
-                layout: 'fit',
-                id: "tabUpdate",
-                cls: 'tab',
-                name: "tabUpdate",
-                items: [
-                    {
-                        xtype: 'syno_compositefield',
-                        hideLabel: true,
-                        height: 100,
-                        items: [
-                            this.createUploadPannel()
-                        ]
-                    }
                 ]
             });
 
@@ -130,19 +118,12 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         });
     },
     createUploadPannel: function () {
-        var that = this;
         var myFormPanel = new Ext.form.FormPanel({
-            cls: 'panel-with-border',
-            title: 'Please select the update file:',
+            title: _V("ui", "lb_select_update_file"),
             url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
-            height: '80%',
             fileUpload: true,
-            width: '98%',
+            name: 'upload_form',
             border: !1,
-            layout: {
-                type: 'vbox',
-                align: 'center'
-            },
             bodyPadding: 10,
             items: [{
                 xtype: 'syno_filebutton',
@@ -150,22 +131,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 name: 'filename',
                 allowBlank: false,
             }],
-            buttons: [{
-                text: _T('ldap', 'upload'),
-                xtype: 'syno_button',
-                btnStyle: 'green',
-                handler: function () {
-                    var form = myFormPanel.getForm();
-                    var fileObject = form.el.dom[1].files[0];
-                    if (!form.isValid()) {
-                        that.showMsg('error', 'Please select the update/updateAll file before start uploading.');
-                        return;
-                    }
-                    that.getEl().mask(_T("common", "loading"), "x-mask-loading");
-                    that.onUploadFile(fileObject, that);
-                }
-            }]
         });
+        this["upload_form"] = myFormPanel;
         return myFormPanel;
     },
     createSystemInfoPannel: function () {
@@ -273,6 +240,20 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         hideLabel: true,
                         items: [{
                             xtype: 'syno_displayfield',
+                            value: 'Run Update: ',
+                            width: 140
+                        }, {
+                            xtype: 'syno_button',
+                            btnStyle: 'green',
+                            text: 'Upload file',
+                            handler: this.showUpdateUploadDialog.bind(this)
+                        }]
+                    },
+                    {
+                        xtype: 'syno_compositefield',
+                        hideLabel: true,
+                        items: [{
+                            xtype: 'syno_displayfield',
                             value: 'Run task: ',
                             width: 140
                         }, {
@@ -280,34 +261,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             btnStyle: 'green',
                             text: 'Mount the loader disk',
                             handler: this.onRunTaskMountLoaderDiskClick.bind(this)
-                        }]
-                    },
-                    {
-                        xtype: 'syno_compositefield',
-                        hideLabel: true,
-                        items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Run task: ',
-                            width: 140
-                        }, {
-                            xtype: 'syno_button',
-                            btnStyle: 'red',
-                            text: 'UnMount the loader disk',
-                            handler: this.onRunTaskUnMountLoaderDiskClick.bind(this)
-                        }]
-                    },
-                    {
-                        xtype: 'syno_compositefield',
-                        hideLabel: true,
-                        items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Get RR config:',
-                            width: 140
-                        }, {
-                            xtype: 'syno_button',
-                            btnStyle: 'blue',
-                            text: 'Force RR Update',
-                            handler: this.onRunRrUpdateManuallyClick.bind(this)
                         }]
                     },
                     {
@@ -464,7 +417,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 });
             });
         },
-        //api=SYNO.DSM.Info&method=getinfo&version=2
         getSytemInfo: function () {
             return new Promise((resolve, reject) => {
                 Ext.Ajax.request({
@@ -636,13 +588,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         console.log("error create EventScheduler task");
                         return;
                     }
-
-                    if (token != "" && callback) {
-                        callback();
-                        // this.runSchedulerTask();
-                    } else {
-                        this.sendRunSchedulerTaskWebAPI("");
-                    }
                 },
                 scope: this,
             }
@@ -655,9 +600,9 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
             this.sendWebAPI(args);
         },
-        createRunRrUpdateTask: function (token, callback) {
+        createRunSetPriviledgeForRRTask: function (token) {
             params = {
-                task_name: "RunRrUpdate",
+                task_name: "SetRootPrivsToRrManager",
                 owner: { 0: "root" },
                 event: "bootup",
                 enable: false,
@@ -667,7 +612,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 notify_if_error: false,
                 operation_type: "script",
                 operation:
-                    ". /var/packages/rr-manager/target/app/config.txt\n/usr/bin/rr-update.sh updateRR \"$UPLOAD_DIR_PATH$RR_TMP_DIR\"/update.zip /tmp/rr_update_progress",
+                    "sed -i 's/package/root/g' /var/packages/rr-manager/conf/privilege && synopkg restart rr-manager",
             };
 
             if (token != "") {
@@ -684,11 +629,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         return;
                     }
 
-                    if (token != "" && callback) {
-                        callback();
-                        // this.runSchedulerTask();
-                    } else {
-                        this.sendRunSchedulerTaskWebAPI("");
+                    if (token != "") {
+                        this.API.sendRunSchedulerTaskWebAPI.bind(this, { token });
                     }
                 },
                 scope: this,
@@ -702,13 +644,35 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
             this.sendWebAPI(args);
         },
-        createAndRunSchedulerTask: function () {
-            this.fetchSynoConfirmPWToken(
+        sendRunSchedulerTaskWebAPI: function (token) {
+            args = {
+                api: "SYNO.Core.EventScheduler",
+                method: "run",
+                version: 1,
+                params: {
+                    task_name: "SetRootPrivsToRrManager",
+                },
+                callback: function (success, message, data) {
+                    if (!success) {
+                        console.log("error run EventScheduler task");
+                        return;
+                    }
+                },
+                scope: this,
+            };
+
+            if (token != "") {
+                params.SynoConfirmPWToken = token
+            }
+            this.sendWebAPI(args);
+        },
+        createAndRunSchedulerTask: function (data) {
+            this.fetchSynoConfirmPWToken(data,
                 this.API.createRunRrUpdateTask.bind(this)
             );
         },
-        createAndRunSchedulerTaskSetRootPrivilegesForRrManager: function () {
-            this.fetchSynoConfirmPWToken(
+        createAndRunSchedulerTaskSetRootPrivilegesForRrManager: function (data) {
+            this.fetchSynoConfirmPWToken(data,
                 this.API.createRunSetPriviledgeForRRTask.bind(this)
             );
         },
@@ -721,7 +685,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     },
     onRunCleanUpSystemPartition: function () {
         var that = this;
-        this.showPrompt("Would you like to run clean up sustem partition script?", x => {
+        this.showPrompt(_V("ui", "confirm_system_clean_up_msg"), _V("ui", "confirm_system_clean_up_title"), x => {
             this.API.callCustomScript("../../clean_system_disk.cgi")
                 .then((x) => that.showMsg("Done", `The script has been successfully runned.`))
                 .catch((e) => that.showMsg("Error", `Unable to run cleanup script. ${e}`));
@@ -737,22 +701,22 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         return new SYNO.SDS.MessageBoxV5()
             .alert(title, msg);
     },
-    showPrompt: function (text, yesCallback) {
+    showPrompt: function (text, title, yesCallback) {
         var window = new SYNO.SDS.ModalWindow({
             closeAction: "hide",
             layout: "fit",
             width: 400,
             height: 200,
             resizable: !1,
-            title: "Confirm update",
+            title: title,
             buttons: [{
-                text: "Cancel",
+                text: _T("common", "alt_cancel"),
                 // Handle Cancel
                 handler: function () {
                     window.close();
                 }
             }, {
-                text: "Confirm",
+                text: _T("iu", "alt_confirm"),
                 itemId: "confirm",
                 btnStyle: "blue",
                 // Handle Confirm
@@ -776,7 +740,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         that = this;
         this.API.getUpdateFileInfo(that.updateFileRealPath()).then((responseText) => {
             if (!responseText.success) {
-                that.showMsg('title', `Unable to update RR: ${responseText?.error}. \n Please upload the file and try againe.`);
+                that.showMsg('title', formatString(_V('ui', 'unable_update_rr_msg'), responseText?.error));
                 return;
             }
 
@@ -810,7 +774,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             }
             that.showPrompt(
                 `Curent RR version: ${currentRrVersion}. Update file version: ${updateRrVersion}`,
-                runUpdate);
+                "Confirm update", runUpdate);
         }).catch(error => {
             that.showMsg('title', `Error. ${error}`);
         });
@@ -845,8 +809,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             }
         };
 
-        // addItems(userConfig, '');
-        // panel.doLayout();
     },
     //
     // Stores
@@ -1041,13 +1003,68 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
         };
         return new SYNO.ux.GridPanel(c);
     },
-    showPasswordConfirmDialog: function (callback) {
+    showPasswordConfirmDialog: function (taskName) {
+        return new Promise((resolve, reject) => {
+            var window = new SYNO.SDS.ModalWindow({
+                id: "confirm_password_dialog",
+                title: `${_T("common", "enter_password_to_continue")} for task: ${taskName}.`,
+                width: 500,
+                height: 200,
+                resizable: false,
+                layout: "fit",
+                buttons: [
+                    {
+                        xtype: "syno_button",
+                        text: _T("common", "alt_cancel"),
+                        scope: this,
+                        handler: function () {
+                            Ext.getCmp("confirm_password_dialog").close();
+                            reject(new Error("User cancelled password dialog."));
+                        },
+                    },
+                    {
+                        xtype: "syno_button",
+                        text: _T("common", "submit"),
+                        btnStyle: "blue",
+                        scope: this,
+                        handler: function () {
+                            const passwordValue = Ext.getCmp("confirm_password").getValue();
+                            Ext.getCmp("confirm_password_dialog").close();
+                            resolve(passwordValue);
+                        }
+                    },
+                ],
+                items: [
+                    {
+                        xtype: "syno_formpanel",
+                        id: "password_form_panel",
+                        bodyStyle: "padding: 0",
+                        items: [
+                            {
+                                xtype: "syno_displayfield",
+                                value: String.format(_T("common", "enter_user_password")),
+                            },
+                            {
+                                xtype: "syno_textfield",
+                                fieldLabel: _T("common", "password"),
+                                textType: "password",
+                                id: "confirm_password",
+                            },
+                        ],
+                    },
+                ],
+            });
+            window.open();
+        });
+    },
+    showUpdateUploadDialog: function () {
+        that = this;
         var window = new SYNO.SDS.ModalWindow({
-            id: "confirm_password_dialog",
-            title: _T("common", "enter_password_to_continue"),
+            id: "upload_file_dialog",
+            title: _V("ui", "upload_file_dialog_title"),
             width: 500,
-            height: 200,
-            resizable: !1,
+            height: 400,
+            resizable: false,
             layout: "fit",
             buttons: [
                 {
@@ -1056,6 +1073,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     scope: this,
                     handler: function () {
                         Ext.getCmp("confirm_password_dialog").close();
+                        reject(new Error("User cancelled password dialog."));
                     },
                 },
                 {
@@ -1063,40 +1081,32 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     text: _T("common", "submit"),
                     btnStyle: "blue",
                     scope: this,
-                    handler: callback//this.API.createAndRunSchedulerTask.bind(this),
+                    handler: function () {
+                        const form = that["upload_form"].getForm();
+                        var fileObject = form.el.dom[1].files[0];
+                        if (!form.isValid()) {
+                            that.showMsg('error', _V('ui', 'upload_update_file_form_validation_invalid_msg'));
+                            return;
+                        }
+                        that.getEl().mask(_T("common", "loading"), "x-mask-loading");
+                        that.onUploadFile(fileObject, that);
+                        Ext.getCmp("upload_file_dialog").close();
+                    }
                 },
             ],
             items: [
-                {
-                    xtype: "syno_formpanel",
-                    id: "password_form_panel",
-                    bodyStyle: "padding: 0",
-                    items: [
-                        {
-                            xtype: "syno_displayfield",
-                            value: String.format(
-                                _T("common", "enter_user_password")
-                            ),
-                        },
-                        {
-                            xtype: "syno_textfield",
-                            fieldLabel: _T("common", "password"),
-                            textType: "password",
-                            id: "confirm_password",
-                        },
-                    ],
-                },
+                this.createUploadPannel()
             ],
         });
         window.open();
     },
-    fetchSynoConfirmPWToken: function (callback) {
+    fetchSynoConfirmPWToken: function (data, callback) {
         this.sendWebAPI({
             api: "SYNO.Core.User.PasswordConfirm",
             method: "auth",
             version: 2,
             params: {
-                password: Ext.getCmp("confirm_password").getValue(),
+                password: data
             },
             callback: function (success, response) {
                 if (!success) {
@@ -1118,25 +1128,65 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             scope: this,
         });
     },
-    onOpen: function (a) {
+    __checkDownloadFolder: function (callback) {
+        var that = this;
+        this.API.getSharesList().then(x => {
+            var shareName = `/${that['rrManagerConfig']['SHARE_NAME']}`;
+            var sharesList = x.data.shares;
+            var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == shareName);
+            if (!downloadsShareMetadata) {
+                var msg = `❗❗❗Attention! The "${that['rrManagerConfig']['SHARE_NAME']}" share not found. Please create the share and restart the app.`;
+                var tabs = Ext.getCmp('tabsControl');
+                tabs.getEl().mask(msg, "x-mask-loading");
+                this.showMsg('error', msg);
+                return;
+            }
+            //TODO: populate from the config.txt
+            that.downloadFolderRealPath = downloadsShareMetadata?.additional?.real_path;
+            if (callback) callback();
+        });
+    },
+    __checkRequiredTasks: async function () {
         var that = this;
         var requiredTasks = [
-
             {
-                name: "RunRrUpdate", craeteTaskCallback: this.API.createAndRunSchedulerTask.bind(this,
-                    { callback: this.API.createAndRunSchedulerTask.bind(this) })
+                name: "RunRrUpdate",
+                createTaskCallback: this.API.createAndRunSchedulerTask.bind(this)
             },
             {
-                name: "SetRootPrivsToRrManager", craeteTaskCallback: this.API.createTaskRunRrUpdate.bind(this,
-                    { callback: this.API.createAndRunSchedulerTaskSetRootPrivilegesForRrManager.bind(this) })
+                name: "SetRootPrivsToRrManager",
+                createTaskCallback: this.API.createAndRunSchedulerTaskSetRootPrivilegesForRrManager.bind(this)
             }
         ];
-        // { name: "SetRootPrivsToRrManager", craeteTaskCallback: this.API.createTaskRunRrUpdate.bind(this) }];
-        var tasksToCreate = [];
 
+        try {
+            let response = await that.API.getTaskList();
+            var tasks = response.data.tasks;
+            var tasksToCreate = requiredTasks.filter(task => !tasks.find(x => x.name === task.name));
+
+            if (tasksToCreate.length > 0) {
+                let tasksNames = tasksToCreate.map(task => task.name).join(', ');
+                that.showPrompt(`❗❗❗The following required tasks ${tasksNames} are missing in the system.
+    It will require entering your password. \n Do you want to create them?`, "Required components missing",
+                    async function (a) {
+                        for (let task of tasksToCreate) {
+                            if (task.createTaskCallback) {
+                                var data = await that.showPasswordConfirmDialog(task.name);
+                                task.createTaskCallback(data);
+                            }
+                        }
+                        // After all tasks have been created, you might want to notify the user.
+                        that.showMsg('title', "The tasks have been successfully created. Please restart the RR Manager app.");
+                    });
+            }
+        } catch (error) {
+            console.error('Error checking or creating tasks:', error);
+        }
+    },
+    onOpen: function (a) {
+        var that = this;
         SYNOCOMMUNITY.RRManager.AppWindow.superclass.onOpen.call(this, a);
         this.onRunTaskMountLoaderDiskClick();
-
         this.API.callCustomScript('getConfig.cgi').then((responseText) => {
             var configName = 'rrConfig';
             that[configName] = responseText;
@@ -1145,60 +1195,15 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
             that['rrManagerConfig'] = that[configName]['rr_manager_config'];
             that['opts']['params']['path'] = `/${that['rrManagerConfig']['SHARE_NAME']}/${that['rrManagerConfig']['RR_TMP_DIR']}`;
 
-            this.API.getSharesList().then(x => {
-                // var that = this;
-                var shareName = `/${that['rrManagerConfig']['SHARE_NAME']}`;
-                var sharesList = x.data.shares;
-                var downloadsShareMetadata = sharesList.find(x => x.path.toLowerCase() == shareName);
-                if (!downloadsShareMetadata) {
-                    var msg = `❗❗❗Attention! The "${that['rrManagerConfig']['SHARE_NAME']}" share not found. Please create the share and restart the app.`;
-                    var tabs = Ext.getCmp('tabsControl');
-                    tabs.getEl().mask(msg, "x-mask-loading");
-                    this.showMsg('error', msg);
-                    return;
-                }
-                //TODO: populate from the config.txt
-                that.downloadFolderRealPath = downloadsShareMetadata?.additional?.real_path;
-            });
             that.API.getSytemInfo().then((x) => {
                 that['synoInfo'] = x.data;
                 Ext.getCmp('lbSystemInfo').setValue(`Model: ${x?.data?.model}, RAM: ${x?.data?.ram} Gb, DSM version: ${x?.data?.version_string} `);
             });
+            this.__checkDownloadFolder(this.__checkRequiredTasks.bind(this));
         });
         that.API.getPackagesList().then((response) => {
             var rrManagerPackage = response.data.packages.find(p => p.id == 'rr-manager');
             Ext.getCmp('lbRrManagerVersion')?.setValue(`${rrManagerPackage?.version}`);
-        });
-
-        //TODO: implement checking required tasks and if task doesn't exists, ask to create them
-        that.API.getTaskList().then((response) => {
-            var tasks = response.data.tasks;
-
-
-            requiredTasks?.forEach(task => {
-                var isTaskExisting = tasks.find(x => x.name == task.name) != null;
-                if (!isTaskExisting) {
-                    tasksToCreate.push(task.name);
-                    // console.log('Creating the task: '+task.name);
-                    // task?.craeteTaskCallback();
-                }
-            });
-            if (tasksToCreate?.length > 0) {
-                that.showPrompt(`The following tasks ${tasksToCreate.join(', ')} are missing in the system.
-                    It will require enter your password. \n Do you wan't to create them?`,
-                    function (a) {
-                        that.showPasswordConfirmDialog();
-                        // tasksToCreate.forEach(task2create => {
-                        //     var taskMetadata = requiredTasks?.find(x => x.name = task2create);
-                        //     if (taskMetadata && taskMetadata?.craeteTaskCallback) {
-                        //         taskMetadata?.craeteTaskCallback();
-                        //     }
-                        // });
-                        // that.showMsg('title', "The tasks has been succesfully created.\nPlease restart the RR Manager app.");
-                    });
-            }
-
-            console.log('task list: ', tasks);
         });
     },
 
@@ -1262,7 +1267,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 success: (x) => {
                     that?.getEl()?.unmask();
                     this.showPrompt(`File has been successfully uploaded to the downloads folder.
-                                Would you like to run update procedure?`, x => this.onRunRrUpdateManuallyClick());
+                                Would you like to run update procedure?`, "Confirm update", x => this.onRunRrUpdateManuallyClick());
                 },
                 failure: (x) => {
                     that?.getEl()?.unmask();

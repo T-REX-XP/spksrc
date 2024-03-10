@@ -2,3 +2,15 @@
 app_name = "RR Manager"
 description = "RR Manager"
 index_title = "Help documentation"
+
+[ui]
+tab_general = "General"
+tab_addons = "Addons"
+lb_select_update_file = "Please select the update file:"
+upload_update_file_form_validation_invalid_msg = "Please select the update/updateAll file before start uploading."
+alt_confirm = "Confirm"
+update_rr_progress_msg = "Update RR in progress: {0}. \nStatus: {1}."
+confirm_system_clean_up_msg = "Would you like to run clean up sustem partition script?"
+confirm_system_clean_up_title = "Confirm system cleanup"
+unable_update_rr_msg= "Unable to update RR: {0}. \n Please upload the file and try againe."
+upload_file_dialog_title = "Upload File"

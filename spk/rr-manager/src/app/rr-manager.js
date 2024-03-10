@@ -120,7 +120,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createUploadPannel: function () {
         var myFormPanel = new Ext.form.FormPanel({
             title: _V("ui", "lb_select_update_file"),
-            // url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
             fileUpload: true,
             name: 'upload_form',
             border: !1,
@@ -151,8 +150,6 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     // Create the display of CGI calls
     createGeneralSection: function () {
         return new SYNO.ux.FieldSet({
-            // title: 'General',
-            // collapsible: true,
             items: [
                 {
                     xtype: 'syno_panel',
@@ -702,7 +699,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                     window.close();
                 }
             }, {
-                text: _T("iu", "alt_confirm"),
+                text: _V("ui", "alt_confirm"),
                 itemId: "confirm",
                 btnStyle: "blue",
                 // Handle Confirm
@@ -894,7 +891,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         {
                             xtype: 'syno_button',
                             btnStyle: 'green',
-                            text: 'Save Changes',
+                            text: _V('ui','save_addons_changes'),
                             handler: this.saveChanges.bind(this)
                         },
 

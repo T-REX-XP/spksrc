@@ -120,14 +120,14 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     createUploadPannel: function () {
         var myFormPanel = new Ext.form.FormPanel({
             title: _V("ui", "lb_select_update_file"),
-            url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
+            // url: 'webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=2',
             fileUpload: true,
             name: 'upload_form',
             border: !1,
             bodyPadding: 10,
             items: [{
                 xtype: 'syno_filebutton',
-                text: 'Select File',
+                text: _V('ui', 'select_file'),
                 name: 'filename',
                 allowBlank: false,
             }],
@@ -173,7 +173,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                                 {
                                     xtype: 'syno_displayfield',
                                     cls: 'lb-title',
-                                    value: 'Welcome to RR Manager!',
+                                    value: _V('ui', 'greetings_text'),
                                     width: 200,
                                 }]
                         }, {
@@ -194,12 +194,12 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                                     xtype: 'syno_displayfield',
                                     width: 120,
                                     cls: 'lb-title',
-                                    value: '🖥️System Info:'
+                                    value: _V('ui', 'system_info')
                                 }, {
                                     xtype: 'syno_displayfield',
                                     width: 500,
                                     id: 'lbSystemInfo',
-                                    value: 'Loading...'
+                                    value: _V('ui', 'loading_text')
                                 }
                             ]
                         },
@@ -230,7 +230,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
     // Create the display of API calls
     createActionsSection: function () {
         return new SYNO.ux.FieldSet({
-            title: 'RR Loader Actions',
+            title: _V('ui', 'rr_actions'),
             cls: 'panel-with-border',
             collapsible: false,
             items:
@@ -245,22 +245,8 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                         }, {
                             xtype: 'syno_button',
                             btnStyle: 'green',
-                            text: 'Upload file',
+                            text: _V('ui', 'upload_file_dialog_title'),
                             handler: this.showUpdateUploadDialog.bind(this)
-                        }]
-                    },
-                    {
-                        xtype: 'syno_compositefield',
-                        hideLabel: true,
-                        items: [{
-                            xtype: 'syno_displayfield',
-                            value: 'Run task: ',
-                            width: 140
-                        }, {
-                            xtype: 'syno_button',
-                            btnStyle: 'green',
-                            text: 'Mount the loader disk',
-                            handler: this.onRunTaskMountLoaderDiskClick.bind(this)
                         }]
                     },
                     {
@@ -759,16 +745,16 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                 var updateStatusInterval = setInterval(async function () {
                     var checksStatusResponse = await that.API.callCustomScript('checkUpdateStatus.cgi?filename=rr_update_progress');
                     var response = checksStatusResponse.result;
-                    that.getEl().mask(`Update RR in progress: ${response?.progress}. \nStatus${response?.progressmsg}`, 'x-mask-loading');
+                    that.getEl().mask(formatString(_V('ui', 'update_rr_progress_msg'), response?.progress, response?.progressmsg), 'x-mask-loading');
                     countUpdatesStatusAttemp++;
                     if (countUpdatesStatusAttemp == maxCountOfRefreshUpdateStatus || response?.progress?.startsWith('-')) {
                         clearInterval(updateStatusInterval);
                         that?.getEl()?.unmask();
-                        that.showMsg('title', `Unable to update RR. Status code: ${response?.progress},\nReason: ${response?.progressmsg}`,);
+                        that.showMsg('title', formatString(_V('ui'), response?.progress, response?.progressmsg));
                     } else if (response?.progress == '100') {
                         that?.getEl()?.unmask();
                         clearInterval(updateStatusInterval);
-                        that.showMsg('title', `The RR has been successfully updated. Please restart the PC.`);
+                        that.showMsg('title', _V('ui', 'update_rr_completed'));
                     }
                 }, 1500);
             }
@@ -1166,8 +1152,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
 
             if (tasksToCreate.length > 0) {
                 let tasksNames = tasksToCreate.map(task => task.name).join(', ');
-                that.showPrompt(`❗❗❗The following required tasks ${tasksNames} are missing in the system.
-    It will require entering your password. \n Do you want to create them?`, "Required components missing",
+                that.showPrompt(formatString(_V('ui', 'required_tasks_is_missing'), tasksNames), "Required components missing",
                     async function (a) {
                         for (let task of tasksToCreate) {
                             if (task.createTaskCallback) {
@@ -1176,7 +1161,7 @@ Ext.define('SYNOCOMMUNITY.RRManager.AppWindow', {
                             }
                         }
                         // After all tasks have been created, you might want to notify the user.
-                        that.showMsg('title', "The tasks have been successfully created. Please restart the RR Manager app.");
+                        that.showMsg('title', _V('ui','tasks_created_msg'));
                     });
             }
         } catch (error) {
